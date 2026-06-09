@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Portal</string>
+    <string name="title_activity_main">Portal</string>
+    <string name="package_name">nl.havencommunity.portal</string>
+    <string name="custom_url_scheme">nl.havencommunity.portal</string>
+</resources>
