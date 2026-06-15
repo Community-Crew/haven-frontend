@@ -1,0 +1,14 @@
+{
+  "navigation": {
+    "home": "Thuis",
+    "rooms": "Ruimtes",
+    "agenda": "Agenda",
+    "login": "Bewoners Login"
+  },
+  "rooms": {
+    "title": "Gemeenschappelijke Ruimtes",
+    "subtitle": "Selecteer en reserveer gedeelde werkplekken en voorzieningen in het complex.",
+    "loading": "Real-time Haven objecten ophalen...",
+    "reserve": "Ruimte Reserveren"
+  }
+}

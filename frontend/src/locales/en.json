@@ -1,0 +1,14 @@
+{
+  "navigation": {
+    "home": "Home",
+    "rooms": "Rooms",
+    "agenda": "Agenda",
+    "login": "Resident Login"
+  },
+  "rooms": {
+    "title": "Community Spaces",
+    "subtitle": "Select and lock down shared workspace amenities across the complex.",
+    "loading": "Fetching real-time Haven inventory assets...",
+    "reserve": "Reserve Space"
+  }
+}
