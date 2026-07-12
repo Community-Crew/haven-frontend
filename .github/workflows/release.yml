@@ -71,8 +71,9 @@ jobs:
         run: npx cap sync ios
 
       - name: Build Xcode Workspace
+        working-directory: ./frontend/ios/App
         run: |
-          xcodebuild -workspace ios/App/App.xcworkspace \
+          xcodebuild -workspace App.xcodeproj \
                      -scheme App \
                      -sdk iphonesimulator \
                      -configuration Debug \
