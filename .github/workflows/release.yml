@@ -1,0 +1,101 @@
+name: Create Production or Beta Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'       # Triggers on production tags like v1.0.0, v2.4.1
+      - 'v*.*.*-beta*' # Triggers on beta tags like v1.0.0-beta.1, v2.0.0-beta.2
+      - 'v*.*.*-rc*'   # Triggers on release candidate tags like v1.1.0-rc.1
+
+defaults:
+  run:
+    working-directory: ./frontend
+
+permissions:
+  contents: write      # Required permission to create the GitHub Release and upload binaries
+
+jobs:
+  build-and-release:
+    runs-on: macos-latest # Required to build iOS alongside Web and Android
+
+    steps:
+      # ----------------------------------------------------------------
+      # 1. SETUP ENVIRONMENT
+      # ----------------------------------------------------------------
+      - name: Checkout source code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ----------------------------------------------------------------
+      # 2. BUILD WEB CLIENT (Manual Deployment Package)
+      # ----------------------------------------------------------------
+      - name: Compile Vue Web App
+        run: npm run build
+
+      # Compresses the production ready 'dist' directory into a single zip file
+      - name: Package Web App
+        run: zip -r ../web-client-${{ github.ref_name }}.zip dist/
+
+      # ----------------------------------------------------------------
+      # 3. BUILD ANDROID CLIENT (.apk)
+      # ----------------------------------------------------------------
+      - name: Sync Android Assets
+        run: npx cap sync android
+
+      - name: Build Android App (APK)
+        working-directory: ./frontend/android
+        run: ./gradlew assembleDebug # Note: Switch to assembleRelease once you configure keystores
+
+      - name: Move APK for Release Upload
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk ../android-client-${{ github.ref_name }}.apk
+
+      # ----------------------------------------------------------------
+      # 4. BUILD iOS CLIENT (Xcode Build Verification)
+      # ----------------------------------------------------------------
+      - name: Sync iOS Assets
+        run: npx cap sync ios
+
+      - name: Install Pods
+        working-directory: ./frontend/ios/App
+        run: pod install
+
+      - name: Build Xcode Workspace
+        run: |
+          xcodebuild -workspace ios/App/App.xcworkspace \
+                     -scheme App \
+                     -sdk iphonesimulator \
+                     -configuration Debug \
+                     clean build
+
+      # ----------------------------------------------------------------
+      # 5. GENERATE GITHUB RELEASE & UPLOAD ASSETS
+      # ----------------------------------------------------------------
+      - name: Publish Release to GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          generate_release_notes: true # Automatically reads commit messages to compile a changelog
+
+          # Determines if this build is a Beta.
+          # Evaluates to true if the tag contains '-beta' or '-rc'
+          prerelease: ${{ contains(github.ref_name, '-beta') || contains(github.ref_name, '-rc') }}
+
+          # Uploads your web package and android application directly to the release notes block
+          files: |
+            web-client-*.zip
+            android-client-*.apk
