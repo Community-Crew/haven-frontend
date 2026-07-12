@@ -1,14 +1,146 @@
 {
   "navigation": {
-    "home": "Thuis",
+    "home": "Home",
     "rooms": "Ruimtes",
     "agenda": "Agenda",
-    "login": "Bewoners Login"
+    "reservations": "Reserveringen"
+  },
+  "general": {
+    "loading": "Objecten laden...",
+    "back": "⬅️ Terug",
+    "return": "Ga terug naar het overzicht.",
+    "language_label": "Language / Taal",
+    "not_applicable": "n.v.t",
+    "darkmode_beta": "Darkmode is in Beta",
+    "theme_label": "Thema",
+    "logout": "Uitloggen"
   },
   "rooms": {
     "title": "Gemeenschappelijke Ruimtes",
-    "subtitle": "Selecteer en reserveer gedeelde werkplekken en voorzieningen in het complex.",
-    "loading": "Real-time Haven objecten ophalen...",
-    "reserve": "Ruimte Reserveren"
+    "subtitle": "Alle gemeenschappelijke ruimtes in Haven.",
+    "view": "Bekijk Ruimte",
+    "location": "Locatie",
+    "label": "Gemeenschappelijke Ruimte",
+    "not_found": ""
+  },
+  "room_scheduler": {
+    "title": "Ruimteplanner",
+    "subtitle": "Selecteer een tijdslot om de ruimte te reserveren.",
+    "policy_restricted": "Geblokkeerd door het beleid.",
+    "selected": "Geselecteerd",
+    "available": "Beschikbaar",
+    "occupied": "Bezet",
+    "name_label": "Naam van reservering",
+    "placeholder_name": "Bijv. Guus Meeuwis karaoke",
+    "selected_block_label": "Huidig geselecteerde tijdslot:",
+    "share_name_label": "Deel naam met andere bewoners.",
+    "share_name_description": "Laat andere bewoners in Haven weten wie wat aan het doen is in de gemeenschappelijke ruimtes! Dit word alleen gedeeld met bewoners van Haven.",
+    "btn_submitting": "Even Apeldoorn bellen...",
+    "btn_confirm": "Reserveer",
+    "error_fallback": "Er is iets misgegaan bij het reserveren van de ruimte!",
+    "past_slot": "Verstreken"
+  },
+  "room_status": {
+    "available": "Beschikbaar",
+    "occupied": "Bezet",
+    "reserved": "Gereserveerd",
+    "maintenance": "Onderhoud",
+    "cleaning": "Grote Schoonmaak"
+  },
+  "reservations": {
+    "title": "Je Reserveringen",
+    "subtitle": "Bekijk al je toekomstige en eerdere reserveringen.",
+    "room_fallback": "Onbekende Ruimte",
+    "cancel_confirmation": "Annuleren",
+    "tabs": {
+      "upcoming": "Toekomstig",
+      "past": "Verleden"
+    },
+    "filters": {
+      "room_label": "Ruimte: ",
+      "all_rooms": "Alle Ruimtes"
+    },
+    "no_records": "Geen reserveringen gevonden",
+    "actions": {
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "cancel_booking": "Boeking annuleren"
+    },
+    "archive": {
+      "label": "Gearchiveerd"
+    },
+    "statuses": {
+      "pending": "In afwachting",
+      "rejected": "Afgewezen",
+      "approved": "Goedgekeurd",
+      "cancelled": "Geannuleerd"
+    },
+    "private_allocation": "Privéreservering",
+    "success_message": "Reservering is succesvol gemaakt."
+  },
+  "public_layout": {
+    "brand_name": "",
+    "nav": {
+      "explore_rooms": "",
+      "resident_login": ""
+    },
+    "footer_all_rights": ""
+  },
+  "agendas": {
+    "title": "Agenda's",
+    "subtitle": "Bekijk alle activiteiten in Haven!",
+    "load_more_loading": "Meer activiteiten worden geladen!",
+    "load_more_action": "Laad Meer Activiteiten",
+    "empty_agenda": "Deze agenda is leeg.",
+    "show_all": "Alle Agenda's"
+  },
+  "home": {
+    "title": "Home",
+    "subtitle": "Ik heb egt geen idee wa k hier neer mot zette."
+  },
+  "profile": {
+    "title": "Jouw Profiel",
+    "subtitle": "Bekijk je email, en andere persoonlijke gegevens.",
+    "unit_title": "Unit",
+    "unit": {
+      "building": "Gebouw",
+      "floor": "Verdieping",
+      "unit": "Unit"
+    },
+    "actions_title": "Acties",
+    "logout_title": "Uitloggen",
+    "logout_description": "Log de huidige sessie uit."
+  },
+  "public_wip": {
+    "badge": "Binnenkort Beschikbaar",
+    "title": "Deze pagina is momenteel in ontwikkeling!",
+    "subtitle": "Wij zijn bezig met de publieke pagina aan het creëren. Blijf kijken voor updates!",
+    "portal": {
+      "title": "Op zoek naar Het Bewoners Portaal?",
+      "subtitle": "Bewoners hebben nu al toegang tot het Bewoners Portaal!",
+      "action": "Ga naar het Portaal!"
+    }
+  },
+  "errors": {
+    "dashboard_404": {
+      "title": "Kapot, deze pagina bestoat (nog) nie",
+      "subtitle": "Hoe hedde gij hier nou weer gerakt?",
+      "action": "Breng me mer gauw naar huis!"
+    },
+    "public_404": {
+      "status_code": "404",
+      "title": "Oeps, deze pagina bestoat nie",
+      "subtitle": "Wilse wir terug naar de startpagina?",
+      "action": "Breng me mer worrum!"
+    }
+  },
+  "activation": {
+    "title": "Activeer je woonunit",
+    "subtitle": "Welkom bij het Haven Bewoners Portaal. Voer de code in die je hebt verkregen van de Haven Community Crew.",
+    "input_label": "Registratiecode",
+    "btn_loading": "Effe dubbelchecke...",
+    "btn_default": "Account koppelen & Activeren",
+    "invalid_input": "Vul even een geldige code in!",
+    "invalid_code": "Deze code klopt niet of is al gebruikt."
   }
 }

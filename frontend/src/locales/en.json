@@ -3,12 +3,144 @@
     "home": "Home",
     "rooms": "Rooms",
     "agenda": "Agenda",
-    "login": "Resident Login"
+    "reservations": "Reservations"
+  },
+  "general": {
+    "loading": "Fetching objects...",
+    "back": "⬅️ Back",
+    "return": "Go back to overview.",
+    "language_label": "Language / Taal",
+    "not_applicable": "N/A",
+    "darkmode_beta": "Dark mode is in beta.",
+    "theme_label": "Theme",
+    "logout": "Logout"
   },
   "rooms": {
     "title": "Community Spaces",
-    "subtitle": "Select and lock down shared workspace amenities across the complex.",
-    "loading": "Fetching real-time Haven inventory assets...",
-    "reserve": "Reserve Space"
+    "subtitle": "All the communal spaces in Haven.",
+    "view": "View Room",
+    "location": "Location",
+    "label": "Communal Space",
+    "not_found": ""
+  },
+  "room_scheduler": {
+    "title": "Room Scheduler",
+    "subtitle": "Select a timeslot to reserve a space.",
+    "policy_restricted": "Blocked by room policy.",
+    "selected": "Selected",
+    "available": "Available",
+    "occupied": "Occupied",
+    "name_label": "Reservation name",
+    "placeholder_name": "Eg. Birthday party",
+    "selected_block_label": "Current selected time slot: ",
+    "share_name_label": "Share name with other residents.",
+    "share_name_description": "Let other residents in Haven know who is doing what in the communal spaces! This is only shared with Haven residents.",
+    "btn_submitting": "Talking to the mainframe!",
+    "btn_confirm": "Reserve",
+    "error_fallback": "Something went wrong with reserving the room!",
+    "past_slot": "Passed"
+  },
+  "room_status": {
+    "available": "Available",
+    "occupied": "Occupied",
+    "reserved": "Reserved",
+    "maintenance": "Maintainers",
+    "cleaning": "Deep Cleaning"
+  },
+  "reservations": {
+    "title": "Your Reservations",
+    "subtitle": "See all your future and previous reservations.",
+    "room_fallback": "Unknown room",
+    "cancel_confirmation": "Cancel",
+    "tabs": {
+      "upcoming": "Upcoming",
+      "past": "Past"
+    },
+    "filters": {
+      "room_label": "Room: ",
+      "all_rooms": "All rooms"
+    },
+    "no_records": "No Reservations Found",
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "cancel_booking": "Cancel Booking"
+    },
+    "archive": {
+      "label": "Archived"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "approved": "Approved",
+      "cancelled": "Cancelled"
+    },
+    "private_allocation": "Private reservation",
+    "success_message": "Reservations has been made successfully."
+  },
+  "public_layout": {
+    "brand_name": "",
+    "nav": {
+      "explore_rooms": "",
+      "resident_login": ""
+    },
+    "footer_all_rights": ""
+  },
+  "agendas": {
+    "title": "Agendas",
+    "subtitle": "See all activities in haven!",
+    "load_more_loading": "More activities are loading!",
+    "load_more_action": "Load More",
+    "empty_agenda": "This agenda does not contain any items.",
+    "show_all": "Show all"
+  },
+  "home": {
+    "title": "Home",
+    "subtitle": "I dont know what to put here (:"
+  },
+  "profile": {
+    "title": "Your Profile",
+    "subtitle": "See your email, and other personal info.",
+    "unit_title": "Unit",
+    "unit": {
+      "building": "Building:",
+      "floor": "Floor:",
+      "unit": "Unit:"
+    },
+    "actions_title": "Actions",
+    "logout_title": "Logout",
+    "logout_description": "Logout of this current session."
+  },
+  "public_wip": {
+    "badge": "Coming Soon",
+    "title": "This page is currently in development!",
+    "subtitle": "We are currently createing our public webpage. Keep looking for updates!",
+    "portal": {
+      "title": "Looking for the Resident Hub?",
+      "subtitle": "Residents can access the secure portal right now!",
+      "action": "Goto Portal"
+    }
+  },
+  "errors": {
+    "dashboard_404": {
+      "title": "Whoops, this page doesnt exist",
+      "subtitle": "How did you end up here?",
+      "action": "Take me back!"
+    },
+    "public_404": {
+      "status_code": "404",
+      "title": "Whoops, this page doesn't exist",
+      "subtitle": "Want to head back to the homepage?",
+      "action": "Take me back!"
+    }
+  },
+  "activation": {
+    "title": "Activate Your Unit",
+    "subtitle": "Welcome to the Haven Resident Hub. Enter the registration code you got from Haven Community Crew.",
+    "input_label": "Registration Code",
+    "btn_loading": "Verifying...",
+    "btn_default": "Link Account & Activate",
+    "invalid_input": "Please input an valid code!",
+    "invalid_code": "This code is either not know or already used."
   }
 }

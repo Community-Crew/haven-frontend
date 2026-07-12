@@ -10,7 +10,10 @@
     --color-haven-red: #f05737;
     --color-haven-green: #305248;
     --color-haven-blue: #091d4b;
+
 }
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
     html, body, #app {

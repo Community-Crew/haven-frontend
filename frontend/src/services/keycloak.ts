@@ -4,7 +4,7 @@ import {Capacitor} from "@capacitor/core";
 import {Browser} from "@capacitor/browser";
 import App from "@/App.vue";
 import {Preferences} from "@capacitor/preferences";
-
+import {useProfileStore} from "@/stores/profile";
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -20,6 +20,8 @@ const initOptions: KeycloakConfig = {
 
 const keycloak = new Keycloak(initOptions);
 
+let tokenRefreshInterval: ReturnType<typeof setInterval> | null = null;
+
 export const authState = reactive<AuthState>({
     isAuthenticated: false,
     user: null,
@@ -27,22 +29,23 @@ export const authState = reactive<AuthState>({
 });
 
 const saveTokens = async (token: string, refreshToken: string) => {
-    await Preferences.set({ key: 'kc_token', value: token });
-    await Preferences.set({ key: 'kc_refreshToken', value: refreshToken });
+    await Preferences.set({key: 'kc_token', value: token});
+    await Preferences.set({key: 'kc_refreshToken', value: refreshToken});
 };
 
 const clearTokens = async () => {
-    await Preferences.remove({ key: 'kc_token' });
-    await Preferences.remove({ key: 'kc_refreshToken' });
+    await Preferences.remove({key: 'kc_token'});
+    await Preferences.remove({key: 'kc_refreshToken'});
 };
 
 export const initKeycloak = async (): Promise<boolean> => {
-    const { value: storedToken } = await Preferences.get({ key: 'kc_token' });
-    const { value: storedRefreshToken } = await Preferences.get({ key: 'kc_refreshToken' });
+    const {value: storedToken} = await Preferences.get({key: 'kc_token'});
+    const {value: storedRefreshToken} = await Preferences.get({key: 'kc_refreshToken'});
 
     return new Promise((resolve, reject) => {
         const initConfig: any = {
             responseMode: 'query',
+            checkLoginIframe: false,
         };
 
         if (storedToken && storedRefreshToken) {
@@ -73,11 +76,10 @@ export const initKeycloak = async (): Promise<boolean> => {
 export const login = async (): Promise<void> => {
     if (Capacitor.isNativePlatform()) {
         const redirectUri = 'havenportal://authentication';
-        const loginUrl = await keycloak.createLoginUrl({ redirectUri });
+        const loginUrl = await keycloak.createLoginUrl({redirectUri});
 
-        await Browser.open({ url: loginUrl });
+        await Browser.open({url: loginUrl});
     } else {
-        // Fallback to normal web browser redirect
         await keycloak.login();
     }
 };
@@ -95,10 +97,14 @@ const setupDeepLinkListener = () => {
             if (code && state) {
                 keycloak.init({
                     onLoad: undefined,
-                    responseMode: 'query'
+                    responseMode: 'query',
+                    checkLoginIframe: false
                 }).then(() => {
-                    (keycloak as any).processCallback({ code, state }).then(() => {
+                    (keycloak as any).processCallback({code, state}).then(async () => {
                         updateState(true);
+
+                        const profileStore = useProfileStore();
+                        await profileStore.fetchProfile();
                     });
                 });
             }
@@ -108,6 +114,7 @@ const setupDeepLinkListener = () => {
 
 const updateState = (authenticated: boolean) => {
     authState.isAuthenticated = authenticated;
+
     if (authenticated && keycloak.token && keycloak.refreshToken) {
         authState.token = keycloak.token;
         authState.user = keycloak.tokenParsed ?? null;
@@ -115,11 +122,20 @@ const updateState = (authenticated: boolean) => {
         saveTokens(keycloak.token, keycloak.refreshToken)
             .catch(err => console.error('Failed to save tokens to storage:', err));
 
-        setInterval(() => {
+        if (tokenRefreshInterval) {
+            clearInterval(tokenRefreshInterval);
+            tokenRefreshInterval = null;
+        }
+
+        tokenRefreshInterval = setInterval(() => {
             keycloak.updateToken(70)
-                .then((refreshed) => {
+                .then(async (refreshed) => {
                     if (refreshed && keycloak.token && keycloak.refreshToken) {
                         authState.token = keycloak.token;
+
+                        const profileStore = useProfileStore();
+                        await profileStore.fetchProfile();
+
                         saveTokens(keycloak.token, keycloak.refreshToken)
                             .catch(err => console.error('Failed to save refreshed tokens:', err));
                     }
@@ -127,13 +143,23 @@ const updateState = (authenticated: boolean) => {
                 .catch(() => {
                     console.error('Failed to refresh token');
                 });
-        }, 30000);
+        }, 60000);
     }
 };
 
 export const logout = async (): Promise<void> => {
+    if (tokenRefreshInterval) {
+        clearInterval(tokenRefreshInterval);
+        tokenRefreshInterval = null;
+    }
+
     const redirectUri = Capacitor.isNativePlatform() ? 'havenportal://authentication' : window.location.origin;
-    await keycloak.logout({ redirectUri });
+
+    const profileStore = useProfileStore();
+    profileStore.clearProfile();
+    await clearTokens();
+
+    await keycloak.logout({redirectUri});
     authState.isAuthenticated = false;
     authState.token = null;
     authState.user = null;
