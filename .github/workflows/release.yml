@@ -70,10 +70,6 @@ jobs:
       - name: Sync iOS Assets
         run: npx cap sync ios
 
-      - name: Install Pods
-        working-directory: ./frontend/ios/App
-        run: pod install
-
       - name: Build Xcode Workspace
         run: |
           xcodebuild -workspace ios/App/App.xcworkspace \
