@@ -3,6 +3,7 @@ name: Compile All Clients (Web, Android, iOS)
 on:
   push:
     branches: [ develop ]
+  workflow_dispatch:
 
 # Sets the default working directory for all run steps to the frontend folder
 defaults:
