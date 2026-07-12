@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: 'npm'
@@ -34,10 +34,10 @@ jobs:
         run: npm run build
 
       - name: Upload Web Artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: web-dist-package
-          path: frontend/dist/ # Pointing to the subfolder path
+          path: dist/ # Fixed: relative to the frontend working directory
 
   # ----------------------------------------------------------------
   # 2. ANDROID CLIENT (.apk)
@@ -46,10 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: 'npm'
@@ -75,10 +75,10 @@ jobs:
         run: ./gradlew assembleDebug
 
       - name: Upload Android APK
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v6
         with:
           name: android-debug-apk
-          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk # Fixed: relative to working directory
 
   # ----------------------------------------------------------------
   # 3. iOS CLIENT (Xcode Build)
@@ -87,10 +87,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: 'npm'
@@ -105,11 +105,10 @@ jobs:
       - name: Sync Capacitor Assets
         run: npx cap sync ios
 
-
-      - name: Build Xcode Workspace
+      - name: Build Xcode Project
         working-directory: ./frontend/ios/App
         run: |
-          xcodebuild -workspace App.xcodeproj \
+          xcodebuild -project App.xcodeproj \
                      -scheme App \
                      -sdk iphonesimulator \
                      -configuration Debug \
