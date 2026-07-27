@@ -5,14 +5,14 @@ on:
     tags:
       - 'v*.*.*' # Production tags only (excludes -beta/-rc below)
 
-defaults:
-  run:
-    working-directory: ./frontend
-
 jobs:
   build:
     if: ${{ !contains(github.ref_name, '-beta') && !contains(github.ref_name, '-rc') }}
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./frontend
 
     steps:
       - name: Checkout source code
