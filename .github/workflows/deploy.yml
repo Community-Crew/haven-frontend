@@ -1,0 +1,55 @@
+name: Deploy Frontend to Production
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Production tags only (excludes -beta/-rc below)
+
+defaults:
+  run:
+    working-directory: ./frontend
+
+jobs:
+  build:
+    if: ${{ !contains(github.ref_name, '-beta') && !contains(github.ref_name, '-rc') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: './frontend/package-lock.json'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Vue Web App
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-dist
+          path: frontend/dist/
+          retention-days: 1
+
+  deploy:
+    needs: build
+    runs-on: [self-hosted, haven-frontend-deploy]
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: web-dist
+          path: /tmp/web-dist
+
+      - name: Sync build to web root
+        run: |
+          rsync -a --delete /tmp/web-dist/ /var/www/havencommunity-frontend/dist/
+          rm -rf /tmp/web-dist
