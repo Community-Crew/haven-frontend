@@ -2,7 +2,7 @@ import Keycloak, {type KeycloakConfig, type KeycloakTokenParsed} from "keycloak-
 import {reactive} from "vue";
 import {Capacitor} from "@capacitor/core";
 import {Browser} from "@capacitor/browser";
-import App from "@/App.vue";
+import {App} from "@capacitor/app";
 import {Preferences} from "@capacitor/preferences";
 import {useProfileStore} from "@/stores/profile";
 
