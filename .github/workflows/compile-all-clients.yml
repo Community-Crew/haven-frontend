@@ -5,11 +5,6 @@ on:
     branches: [ development ]
   workflow_dispatch:
 
-# Sets the default working directory for all run steps to the frontend folder
-defaults:
-  run:
-    working-directory: ./frontend
-
 jobs:
   # ----------------------------------------------------------------
   # 1. WEB CLIENT (Manual Download)
@@ -25,7 +20,7 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
+          cache-dependency-path: './package-lock.json'
 
       - name: Install dependencies
         run: npm ci
@@ -37,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: web-dist-package
-          path: dist/ # Fixed: relative to the frontend working directory
+          path: dist/
 
   # ----------------------------------------------------------------
   # 2. ANDROID CLIENT (.apk)
@@ -53,7 +48,7 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
+          cache-dependency-path: './package-lock.json'
 
       - name: Set up JDK 21
         uses: actions/setup-java@v5
@@ -71,7 +66,7 @@ jobs:
         run: npx cap sync android
 
       - name: Build Android App (Debug APK)
-        working-directory: ./frontend/android
+        working-directory: ./android
         run: ./gradlew assembleDebug
 
       - name: Upload Android APK
@@ -94,7 +89,7 @@ jobs:
         with:
           node-version: 24
           cache: 'npm'
-          cache-dependency-path: './frontend/package-lock.json'
+          cache-dependency-path: './package-lock.json'
 
       - name: Install dependencies
         run: npm ci
@@ -106,7 +101,7 @@ jobs:
         run: npx cap sync ios
 
       - name: Build Xcode Project
-        working-directory: ./frontend/ios/App
+        working-directory: ./ios/App
         run: |
           xcodebuild -project App.xcodeproj \
                      -scheme App \
