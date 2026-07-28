@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router'
+import {Capacitor} from "@capacitor/core"
 import {authState, login} from "@/services/keycloak.ts"
 import {useProfileStore} from "@/stores/profile.ts";
 
@@ -29,6 +30,10 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
+    if (Capacitor.isNativePlatform() && to.name === 'public.wip') {
+        return {name: 'home.index'};
+    }
+
     const isPublic = to.matched.some((record) => record.meta.isPublic === true) && !to.path.startsWith('/dashboard');
     const bypassActivationCheck = to.matched.some((record) => record.meta.bypassActivationCheck === true);
     const profileStore = useProfileStore()
