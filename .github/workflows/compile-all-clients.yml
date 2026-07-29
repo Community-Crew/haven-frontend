@@ -107,4 +107,53 @@ jobs:
                      -scheme App \
                      -sdk iphonesimulator \
                      -configuration Debug \
+                     -derivedDataPath ../../DerivedData \
                      clean build
+
+      - name: Boot iOS Simulator
+        run: |
+          DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          for runtime, devices in data['devices'].items():
+              if 'iOS' not in runtime:
+                  continue
+              for d in devices:
+                  if d['name'].startswith('iPhone'):
+                      print(d['udid'])
+                      sys.exit(0)
+          sys.exit(1)
+          ")
+          echo "Booting device $DEVICE_ID"
+          echo "DEVICE_ID=$DEVICE_ID" >> "$GITHUB_ENV"
+          xcrun simctl boot "$DEVICE_ID"
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+
+      - name: Install and launch app in Simulator
+        run: |
+          xcrun simctl install "$DEVICE_ID" DerivedData/Build/Products/Debug-iphonesimulator/App.app
+          xcrun simctl launch --console "$DEVICE_ID" nl.havencommunity.portal > ios-boot-console.log 2>&1 &
+          sleep 8
+          xcrun simctl io "$DEVICE_ID" screenshot ios-boot-screenshot.png
+
+      - name: Test havenportal:// URL scheme registration
+        run: |
+          xcrun simctl openurl "$DEVICE_ID" "havenportal://authentication?code=test&state=test"
+          sleep 3
+          xcrun simctl io "$DEVICE_ID" screenshot ios-deeplink-screenshot.png
+
+      - name: Collect Simulator system log
+        if: always()
+        run: |
+          xcrun simctl spawn "$DEVICE_ID" log show --predicate 'process == "App"' --style compact --last 3m > ios-system.log 2>&1 || true
+
+      - name: Upload iOS Simulator test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: ios-simulator-test
+          path: |
+            ios-boot-screenshot.png
+            ios-deeplink-screenshot.png
+            ios-boot-console.log
+            ios-system.log
