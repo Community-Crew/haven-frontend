@@ -48,6 +48,15 @@ export const initKeycloak = async (): Promise<boolean> => {
             checkLoginIframe: false,
         };
 
+        if (Capacitor.isNativePlatform()) {
+            // Capacitor's Cordova compatibility layer makes keycloak-js
+            // auto-detect its 'cordova' adapter, whose redirectUri resolver
+            // ignores the per-call redirectUri passed to createLoginUrl and
+            // only reads this.redirectUri (falling back to a hardcoded
+            // 'http://localhost' otherwise). Setting it here is required.
+            initConfig.redirectUri = 'havenportal://authentication';
+        }
+
         if (storedToken && storedRefreshToken) {
             initConfig.token = storedToken;
             initConfig.refreshToken = storedRefreshToken;
