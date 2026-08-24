@@ -111,7 +111,16 @@ jobs:
                      clean build
 
       - name: Boot iOS Simulator
+        # First boot on a fresh runner pays a one-time "Data Migration" cost
+        # (locationd/FaceTime/iCloud Tabs/etc. migrator plugins) that alone
+        # took ~5:30 in practice - keep real headroom above that.
+        timeout-minutes: 12
         run: |
+          set -euo pipefail
+
+          echo "Available devices:"
+          xcrun simctl list devices available
+
           DEVICE_ID=$(xcrun simctl list devices available -j | python3 -c "
           import json, sys
           data = json.load(sys.stdin)
@@ -124,20 +133,30 @@ jobs:
                       sys.exit(0)
           sys.exit(1)
           ")
+
+          if [ -z "$DEVICE_ID" ]; then
+            echo "::error::No available iPhone simulator found on this runner"
+            exit 1
+          fi
+
           echo "Booting device $DEVICE_ID"
           echo "DEVICE_ID=$DEVICE_ID" >> "$GITHUB_ENV"
           xcrun simctl boot "$DEVICE_ID"
           xcrun simctl bootstatus "$DEVICE_ID" -b
 
       - name: Install and launch app in Simulator
+        timeout-minutes: 3
         run: |
+          set -euo pipefail
           xcrun simctl install "$DEVICE_ID" DerivedData/Build/Products/Debug-iphonesimulator/App.app
           xcrun simctl launch --console "$DEVICE_ID" nl.havencommunity.portal > ios-boot-console.log 2>&1 &
           sleep 8
           xcrun simctl io "$DEVICE_ID" screenshot ios-boot-screenshot.png
 
       - name: Test havenportal:// URL scheme registration
+        timeout-minutes: 2
         run: |
+          set -euo pipefail
           xcrun simctl openurl "$DEVICE_ID" "havenportal://authentication?code=test&state=test"
           sleep 3
           xcrun simctl io "$DEVICE_ID" screenshot ios-deeplink-screenshot.png

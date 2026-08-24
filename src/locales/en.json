@@ -92,7 +92,10 @@
     "load_more_loading": "More activities are loading!",
     "load_more_action": "Load More",
     "empty_agenda": "This agenda does not contain any items.",
-    "show_all": "Show all"
+    "show_all": "Show all",
+    "item_not_found": "This agenda item could not be found.",
+    "description": "Description",
+    "host": "Host"
   },
   "home": {
     "title": "Home",

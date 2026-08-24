@@ -10,8 +10,8 @@ export const agendaService = {
         return response.data;
     },
 
-    getAgenda: async (id: number) => {
-        const response = await publicApi.get(`/agendas/${id}`);
+    getAgenda: async (idOrSlug: number | string) => {
+        const response = await publicApi.get(`/agendas/${idOrSlug}`);
         return response.data;
     }
 }

@@ -92,7 +92,10 @@
     "load_more_loading": "Meer activiteiten worden geladen!",
     "load_more_action": "Laad Meer Activiteiten",
     "empty_agenda": "Deze agenda is leeg.",
-    "show_all": "Alle Agenda's"
+    "show_all": "Alle Agenda's",
+    "item_not_found": "Dit agendaonderdeel kon niet worden gevonden.",
+    "description": "Omschrijving",
+    "host": "Host"
   },
   "home": {
     "title": "Home",

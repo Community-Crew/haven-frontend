@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import AppLayout from "@/layouts/AppLayout.vue";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
+import {useRoute, useRouter} from "vue-router";
 import {agendaService} from "@/services/agendaService.js";
 import type {Agenda} from "@/types/agenda.js";
 import PageTitle from "@/components/utils/PageTitle.vue";
+
+const route = useRoute()
+const router = useRouter()
 
 const agendasList = ref<Agenda[]>([])
 const isLoading = ref(true)
 const isLoadingMore = ref(false)
 const errorMessage = ref<string | null>(null)
-const selectedAgendaId = ref<number | 'all'>('all')
+const selectedAgendaSlug = ref<string | 'all'>('all')
 const nextPageUrl = ref<string | null>(null)
 
 const fetchAgendaData = async (isLoadMore = false) => {
@@ -52,7 +56,59 @@ const formatEventTime = (startStr: string, endStr: string) => {
   return `${format(startStr)} - ${format(endStr)}`;
 }
 
+const formatEventDate = (dateStr: string) => {
+  const d = new Date(dateStr.replace(/-/g, "/"));
+  return d.toLocaleDateString([], {day: '2-digit', month: 'short', year: 'numeric'});
+}
+
+const stripHtml = (html: string) => html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+
+const placeholderPalette = [
+  {bg: 'bg-haven-pink', text: 'text-haven-blue'},
+  {bg: 'bg-haven-yellow', text: 'text-haven-blue'},
+  {bg: 'bg-haven-light-blue', text: 'text-haven-blue'},
+  {bg: 'bg-haven-red', text: 'text-white'},
+  {bg: 'bg-haven-green', text: 'text-white'},
+  {bg: 'bg-haven-blue', text: 'text-white'},
+]
+
+const getPlaceholderStyle = (id: number) => placeholderPalette[id % placeholderPalette.length]!
+
+const agendaBadgePalette = [
+  {bg: 'bg-haven-blue/10', text: 'text-haven-blue'},
+  {bg: 'bg-haven-red/10', text: 'text-haven-red'},
+  {bg: 'bg-haven-green/10', text: 'text-haven-green'},
+  {bg: 'bg-haven-pink/20', text: 'text-haven-blue'},
+  {bg: 'bg-haven-yellow/20', text: 'text-haven-blue'},
+  {bg: 'bg-haven-light-blue/20', text: 'text-haven-blue'},
+]
+
+const getAgendaBadgeStyle = (agendaId: number) => agendaBadgePalette[agendaId % agendaBadgePalette.length]!
+
+const visibleItems = computed(() => {
+  const flattened = agendasList.value.flatMap((agenda) =>
+      (agenda.items || []).map((item) => ({...item, agenda}))
+  )
+
+  const filtered = selectedAgendaSlug.value === 'all'
+      ? flattened
+      : flattened.filter((item) => item.agenda.slug === selectedAgendaSlug.value)
+
+  return filtered.sort((a, b) => {
+    return new Date(a.start_date.replace(/-/g, "/")).getTime() - new Date(b.start_date.replace(/-/g, "/")).getTime();
+  })
+})
+
+const handleItemClick = (item: { agenda: Agenda, id: number }) => {
+  router.push({name: 'agenda.item', params: {agendaSlug: item.agenda.slug, itemId: item.id}})
+}
+
 onMounted(() => {
+  const queryAgendaSlug = route.query.agenda
+  if (queryAgendaSlug) {
+    selectedAgendaSlug.value = String(queryAgendaSlug)
+  }
+
   fetchAgendaData()
 })
 </script>
@@ -72,9 +128,9 @@ onMounted(() => {
       <div v-if="agendasList.length > 0"
            class="flex items-center space-x-2 overflow-x-auto pb-3 -mx-4 px-4 scrollbar-none webkit-overflow-scrolling-touch shrink-0">
         <button
-            @click="selectedAgendaId = 'all'"
+            @click="selectedAgendaSlug = 'all'"
             class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider border-2 border-haven-blue transition-all whitespace-nowrap cursor-pointer transform active:scale-95"
-            :class="selectedAgendaId === 'all' ? 'bg-haven-blue text-white shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b]'"
+            :class="selectedAgendaSlug === 'all' ? 'bg-haven-blue text-white shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b]'"
         >
           <span>📅</span> <span>{{ $t('agendas.show_all')}}</span>
         </button>
@@ -82,60 +138,60 @@ onMounted(() => {
         <button
             v-for="agenda in agendasList"
             :key="agenda.id"
-            @click="selectedAgendaId = agenda.id"
+            @click="selectedAgendaSlug = agenda.slug"
             class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider border-2 border-haven-blue transition-all whitespace-nowrap cursor-pointer transform active:scale-95"
-            :class="selectedAgendaId === agenda.id ? 'bg-haven-blue text-white shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b]'"
+            :class="selectedAgendaSlug === agenda.slug ? 'bg-haven-blue text-white shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b]'"
         >
           <span>📆</span> <span>{{ agenda.name }}</span>
         </button>
       </div>
 
-      <div v-if="agendasList.length > 0" class="space-y-8">
+      <div v-if="visibleItems.length > 0" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         <div
-            v-for="agenda in agendasList"
-            :key="agenda.id"
-            v-show="selectedAgendaId === 'all' || selectedAgendaId === agenda.id"
-            class="space-y-4"
+            v-for="item in visibleItems"
+            :key="item.id"
+            @click="handleItemClick(item)"
+            class="bg-white border-2 border-haven-blue rounded-2xl overflow-hidden shadow-[4px_4px_0px_0px_#091d4b] flex flex-col cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#091d4b]"
         >
-          <div class="flex items-center justify-between border-b-2 border-haven-blue/10 pb-2 pl-1">
-            <h2 class="text-sm font-black uppercase tracking-wider text-haven-blue">{{ agenda.name }}</h2>
-            <span class="text-xs font-bold text-slate-400">{{ agenda.slug }}</span>
+          <img
+              v-if="item.image_url"
+              :src="item.image_url"
+              alt="Event cover banner"
+              class="w-full aspect-video object-cover border-b-2 border-haven-blue"
+          />
+          <div
+              v-else
+              :class="[getPlaceholderStyle(item.id).bg, 'w-full aspect-video border-b-2 border-haven-blue flex items-center justify-center p-4']"
+          >
+            <span :class="[getPlaceholderStyle(item.id).text, 'font-black uppercase text-center leading-tight tracking-wide line-clamp-3']">
+              {{ item.title }}
+            </span>
           </div>
 
-          <div v-if="agenda.items && agenda.items.length > 0" class="space-y-4">
-            <div
-                v-for="item in agenda.items"
-                :key="item.id"
-                class="bg-white border-2 border-haven-blue rounded-2xl p-5 shadow-[4px_4px_0px_0px_#091d4b] flex flex-col space-y-3"
-            >
-              <div class="flex items-start justify-between space-x-4">
-                <div class="space-y-1">
-                  <h3 class="text-base font-black text-haven-blue leading-tight">{{ item.title }}</h3>
-                </div>
-                <div class="text-right shrink-0">
-                  <p class="text-xs font-black text-haven-blue">{{
-                      formatEventTime(item.start_date, item.end_date)
-                    }}</p>
-                </div>
-              </div>
-
-              <img
-                  v-if="item.image_url"
-                  :src="item.image_url"
-                  alt="Event cover banner"
-                  class="w-full h-32 object-cover rounded-xl border border-haven-blue/20"
-              />
-
-              <p class="text-xs text-slate-600 font-medium leading-relaxed">
-                {{ item.short_description || item.description }}
-              </p>
+          <div class="p-5 flex flex-col space-y-3 flex-1">
+            <div class="space-y-1">
+              <span :class="[getAgendaBadgeStyle(item.agenda.id).bg, getAgendaBadgeStyle(item.agenda.id).text, 'inline-block text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider']">
+                {{ item.agenda.name }}
+              </span>
+              <h3 class="text-base font-black text-haven-blue leading-tight">{{ item.title }}</h3>
             </div>
-          </div>
 
-          <div v-else class="text-xs text-center italic text-slate-400 py-2">
-            {{ $t('agendas.empty_agenda')}}
+            <div class="flex items-center justify-between text-xs font-black text-haven-blue">
+              <span>{{ formatEventDate(item.start_date) }}</span>
+              <span class="text-haven-blue/60 font-bold">{{
+                  formatEventTime(item.start_date, item.end_date)
+                }}</span>
+            </div>
+
+            <p class="text-xs text-slate-600 font-medium leading-relaxed flex-1">
+              {{ item.short_description || stripHtml(item.description) }}
+            </p>
           </div>
         </div>
+      </div>
+
+      <div v-else-if="agendasList.length > 0" class="text-xs text-center italic text-slate-400 py-10">
+        {{ $t('agendas.empty_agenda')}}
       </div>
 
       <div v-if="nextPageUrl" class="pt-4 text-center">
