@@ -9,6 +9,8 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "vue-i18n-extract": "vue-i18n-extract report --vueFiles './src/**/*.?(ts|vue)' --languageFiles './src/locales/*.?(json)' --add --noEmptyTranslation --exclude reservations.statuses"
   },
   "dependencies": {
@@ -41,6 +43,7 @@
     "typescript": "~6.0.0",
     "vite": "^8.0.8",
     "vite-plugin-vue-devtools": "^8.1.1",
+    "vitest": "^4.1.11",
     "vue-i18n-extract": "^2.0.7",
     "vue-tsc": "^3.2.6"
   },

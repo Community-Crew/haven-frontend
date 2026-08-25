@@ -4,6 +4,14 @@ import { useI18n } from 'vue-i18n'
 import { reservationService } from '@/services/reservationService'
 import { roomService } from "@/services/roomService.ts"
 import type { Reservation } from '@/types/reservations'
+import {
+  buildDateTimeString,
+  findOverlappingReservation,
+  formatBoundaryTime,
+  parseTimeFromIso,
+  reservationEndMinutes,
+  timeToMinutes,
+} from '@/utils/roomSchedulerTime'
 
 const props = defineProps<{
   roomId: number
@@ -49,13 +57,6 @@ const timeSlots = computed(() => {
   return slots
 })
 
-const parseTimeFromIso = (isoString: string): string => {
-  const date = new Date(isoString)
-  const hh = String(date.getHours()).padStart(2, '0')
-  const mm = String(date.getMinutes()).padStart(2, '0')
-  return `${hh}:${mm}`
-}
-
 const getMatchingPolicyEntry = (slotTime: string): any | null => {
   if (!activePolicies.value || activePolicies.value.length === 0) return null
 
@@ -84,14 +85,14 @@ const condensedTimeline = computed(() => {
   const currentTimeStr = getAmsterdamCurrentTime()
 
   const mappedSlots = rawSlots.reduce((acc: any, slotTime) => {
-    const booking = reservations.value.find(res => parseTimeFromIso(res.start_at) === slotTime)
+    const booking = findOverlappingReservation(reservations.value, timeToMinutes(slotTime))
 
     if (booking) {
       acc[slotTime] = {
         status: 'occupied',
         booking: {
           name: shareName.value ? booking.name : t('reservations.private_allocation'),
-          end: parseTimeFromIso(booking.end_at),
+          endMinutes: reservationEndMinutes(booking.end_at),
           organisation: shareName.value ? booking.organisation : null
         }
       }
@@ -130,18 +131,18 @@ const condensedTimeline = computed(() => {
     if (!current) continue
 
     if (current.status === 'occupied') {
-      const endTime = current.booking.end
+      const endMinutes = current.booking.endMinutes
       timeline.push({
         time: slotTime,
         status: 'occupied',
         booking: {
           name: current.booking.name,
-          time_range: `${slotTime} - ${endTime}`,
+          time_range: `${slotTime} - ${formatBoundaryTime(endMinutes)}`,
           organisation: current.booking.organisation
         }
       })
 
-      while (i + 1 < rawSlots.length && (rawSlots[i + 1] ?? '') < endTime) {
+      while (i + 1 < rawSlots.length && timeToMinutes(rawSlots[i + 1] ?? '') < endMinutes) {
         i++
         timeline.push({ time: rawSlots[i], status: 'hidden_by_span' })
       }
@@ -300,22 +301,13 @@ const computedTimeBounds = computed(() => {
 
   if (!firstSlot || !lastSlot) return null
 
-  const [hours = 0, minutes = 0] = lastSlot.split(':').map(Number)
-  let endHours = hours
-  let endMinutes = minutes + 30
-
-  if (endMinutes === 60) {
-    endHours += 1
-    endMinutes = 0
-  }
-
-  const formattedEnd = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`
+  const endMinutes = timeToMinutes(lastSlot) + 30
 
   return {
-    start_at: `${selectedDate.value} ${firstSlot}:00`,
-    end_at: `${selectedDate.value} ${formattedEnd}:00`,
+    start_at: buildDateTimeString(selectedDate.value, timeToMinutes(firstSlot)),
+    end_at: buildDateTimeString(selectedDate.value, endMinutes),
     displayStart: firstSlot,
-    displayEnd: formattedEnd
+    displayEnd: formatBoundaryTime(endMinutes)
   }
 })
 
