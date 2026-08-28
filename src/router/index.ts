@@ -59,6 +59,19 @@ router.beforeEach(async (to) => {
         }
     }
 
+    // Takes priority over activation - always enforced, no bypass, even for
+    // a QR-code deep link into /dashboard/activate. The original destination
+    // is preserved via ?redirect= so it isn't lost, just delayed.
+    if (!profileStore.hasAcceptedPrivacyPolicy && to.name !== 'user.privacy-policy-accept') {
+        console.warn("Privacy policy needs to be re-accepted. Redirecting.");
+        return {name: 'user.privacy-policy-accept', query: {redirect: to.fullPath}};
+    }
+
+    if (to.name === 'user.privacy-policy-accept' && profileStore.hasAcceptedPrivacyPolicy) {
+        console.warn("Privacy policy is already accepted. Redirecting away from the accept page.");
+        return {name: 'home.index'};
+    }
+
     if (!profileStore.isActivated && !bypassActivationCheck) {
         console.warn("User account is unactivated. Redirecting to activation layout.");
         return {name: 'user.activate'};

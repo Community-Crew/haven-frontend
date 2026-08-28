@@ -145,5 +145,19 @@
     "btn_default": "Link Account & Activate",
     "invalid_input": "Please input an valid code!",
     "invalid_code": "This code is either not know or already used."
+  },
+  "privacy_policy": {
+    "title": "Privacy Policy",
+    "last_updated": "Last updated on {date}",
+    "error": "Couldn't load the privacy policy.",
+    "translation_notice": "This is an English translation for convenience. The Dutch version is legally binding.",
+    "no_translation_notice": "An English translation isn't available yet. Showing the Dutch (legally binding) version below."
+  },
+  "privacy_policy_accept": {
+    "title": "Our privacy policy has changed",
+    "subtitle": "Please read the latest version below and accept it to continue.",
+    "action": "I agree",
+    "action_loading": "Working on it...",
+    "error": "Couldn't record your acceptance, please try again."
   }
 }

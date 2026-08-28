@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useProfileStore } from '@/stores/profile'
 import { userService } from '@/services/userService'
 import AppLayout from '@/layouts/AppLayout.vue'
 import {useI18n} from "vue-i18n";
 
+const route = useRoute()
 const router = useRouter()
 const profileStore = useProfileStore()
 const {t} = useI18n();
@@ -14,21 +15,28 @@ const code = ref('')
 const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 
-function formatInput(event: Event) {
-  const target = event.target as HTMLInputElement
-  let cleaned = target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()
+function formatCode(value: string): string {
+  let cleaned = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase()
 
   if (cleaned.length > 8) {
     cleaned = cleaned.slice(0, 8)
   }
 
-  if (cleaned.length > 4) {
-    code.value = `${cleaned.slice(0, 4)}-${cleaned.slice(4)}`
-  } else {
-    code.value = cleaned
-  }
+  return cleaned.length > 4 ? `${cleaned.slice(0, 4)}-${cleaned.slice(4)}` : cleaned
+}
 
+function formatInput(event: Event) {
+  const target = event.target as HTMLInputElement
+  code.value = formatCode(target.value)
   target.value = code.value
+}
+
+// A registration label's QR code links here with the code pre-filled
+// (e.g. /dashboard/activate?code=XXXX-XXXX) so scanning it is enough to land
+// on a ready-to-submit form - the resident just double-checks and confirms.
+const queryCode = route.query.code
+if (typeof queryCode === 'string') {
+  code.value = formatCode(queryCode)
 }
 
 async function handleActivation() {
