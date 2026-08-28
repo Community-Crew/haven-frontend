@@ -37,7 +37,11 @@ const displayedContent = computed(() => {
 
 const formattedUpdatedAt = computed(() => {
   if (!policy.value?.updated_at) return ''
-  const d = new Date(policy.value.updated_at.replace(/-/g, '/'))
+  // updated_at is a full ISO-8601 timestamp (with time + Z), which every
+  // engine parses correctly natively - unlike the date-only "YYYY-MM-DD"
+  // strings elsewhere in the app, this doesn't need the dash->slash
+  // Safari workaround (and applying it here breaks parsing entirely).
+  const d = new Date(policy.value.updated_at)
   return d.toLocaleDateString(locale.value === 'nl' ? 'nl-NL' : 'en-GB', {day: 'numeric', month: 'long', year: 'numeric'})
 })
 </script>
