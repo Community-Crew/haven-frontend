@@ -145,5 +145,19 @@
     "btn_default": "Account koppelen & Activeren",
     "invalid_input": "Vul even een geldige code in!",
     "invalid_code": "Deze code klopt niet of is al gebruikt."
+  },
+  "privacy_policy": {
+    "title": "Privacybeleid",
+    "last_updated": "Laatst bijgewerkt op {date}",
+    "error": "Het privacybeleid kon niet worden geladen.",
+    "translation_notice": "Dit is een Engelse vertaling ter informatie. De Nederlandse versie is juridisch leidend.",
+    "no_translation_notice": "Er is nog geen Engelse vertaling beschikbaar. Hieronder zie je de Nederlandse (juridisch leidende) versie."
+  },
+  "privacy_policy_accept": {
+    "title": "Ons privacybeleid is gewijzigd",
+    "subtitle": "Lees de laatste versie hieronder door en accepteer deze om verder te gaan.",
+    "action": "Ik ga akkoord",
+    "action_loading": "Bezig...",
+    "error": "Accepteren is niet gelukt, probeer het opnieuw."
   }
 }
