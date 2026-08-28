@@ -51,6 +51,17 @@ privateApi.interceptors.response.use(
                 if (router.currentRoute.value.name !== 'user.activate') {
                     router.push({name: 'user.activate'});
                 }
+            } else if (errorData?.errors === 'PRIVACY_POLICY_NOT_ACCEPTED') {
+                console.warn('Privacy policy was updated and needs to be re-accepted. Redirecting...');
+
+                const profileStore = useProfileStore();
+                if (profileStore.profile) {
+                    profileStore.profile.privacy_policy_accepted = false;
+                }
+
+                if (router.currentRoute.value.name !== 'user.privacy-policy-accept') {
+                    router.push({name: 'user.privacy-policy-accept'});
+                }
             } else {
                 console.error('Permission Denied: You do not have the required role or access right for this.');
             }

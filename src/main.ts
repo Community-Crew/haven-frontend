@@ -18,8 +18,15 @@ initKeycloak()
         const profileStore = useProfileStore()
 
         if (!authState.isAuthenticated) {
-            console.warn('Keycloak session invalid on boot. Redirecting to login handler...')
+            console.warn('Keycloak session invalid on boot.')
             app.use(router)
+            await router.isReady()
+            // The router guard's login() call takes over for a private
+            // route (see router/index.ts); for a public one (e.g. "/" or
+            // "/privacy-policy") this just renders normally, which was
+            // broken before - the app never used to mount at all here, so
+            // public pages never rendered for a signed-out visitor.
+            app.mount('#app')
             return
         }
 
@@ -32,13 +39,6 @@ initKeycloak()
 
         app.use(router)
         await router.isReady()
-        const isPublic = router.currentRoute.value.matched.some(record => record.meta.isPublic === true)
-
-        if (!authState.isAuthenticated && !isPublic) {
-            console.log('User unauthenticated on private route. Halting mount for login redirection...')
-            return
-        }
-
         app.mount('#app')
     })
     .catch((error) => {
