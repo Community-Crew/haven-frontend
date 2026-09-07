@@ -11,8 +11,8 @@ export const roomService = {
         return response.data;
     },
 
-    getReservations: async (id: number) => {
-        const response = await privateApi.get(`/rooms/${id}/reservations`);
+    getReservations: async (id: number, date?: string) => {
+        const response = await privateApi.get(`/rooms/${id}/reservations`, {params: date ? {date} : {}});
         return response.data;
     },
 

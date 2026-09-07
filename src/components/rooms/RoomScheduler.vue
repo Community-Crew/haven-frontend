@@ -230,9 +230,14 @@ const fetchInitialData = async () => {
 
 const fetchDateReservations = async () => {
   try {
-    const resResponse = await roomService.getReservations(props.roomId)
+    // The API scopes to this exact day server-side now (it used to return a
+    // flat "next 15 upcoming reservations for the room" with no date filter
+    // at all, so any reservation past the 15th upcoming one for a busy room
+    // silently never reached this filter, regardless of which date was
+    // selected). Still guard on status client-side too, cheaply.
+    const resResponse = await roomService.getReservations(props.roomId, selectedDate.value)
     reservations.value = resResponse.data.filter((res: Reservation) =>
-        res.start_at.startsWith(selectedDate.value ?? '') && res.status !== 'CANCELLED' && res.status !== 'REJECTED'
+        res.status !== 'CANCELLED' && res.status !== 'REJECTED'
     )
   } catch (err) {
     console.error("Failed syncing room reservation boundaries:", err)
