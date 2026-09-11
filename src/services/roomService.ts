@@ -16,7 +16,7 @@ export const roomService = {
         return response.data;
     },
 
-    getWeeklySchedule: async (id: number): Promise<{ data: any }> => {
+    getWeeklySchedule: async (id: number): Promise<{ data: any; effective_today?: string }> => {
         const response = await privateApi.get(`/rooms/${id}/weekly-schedule`);
         return response.data;
     }
