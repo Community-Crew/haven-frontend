@@ -39,6 +39,12 @@ const getAmsterdamCurrentTime = (): string => {
 const reservations = ref<Reservation[]>([])
 const weeklyScheduleCache = ref<any[]>([])
 const activePolicies = ref<{ start: string; end: string; max_days: number }[]>([])
+// "Today" for the max_days_in_advance countdown, as computed by the backend
+// (ReservationPolicyService::effectiveToday()). Once the reservation window
+// opens early (RESERVATION_WINDOW_OPEN_TIME, e.g. 20:00 the evening before),
+// this rolls forward to tomorrow's date - falls back to the real calendar
+// date if the API hasn't returned it yet.
+const effectiveTodayStr = ref<string | null>(null)
 const selectedSlots = ref<string[]>([])
 const reservationName = ref('')
 const shareName = ref<boolean>(true)
@@ -101,7 +107,7 @@ const condensedTimeline = computed(() => {
 
       let isPastMaxDays = false
       if (policyEntry && policyEntry.max_days) {
-        const today = new Date(todayStr)
+        const today = new Date(effectiveTodayStr.value || todayStr)
         const selected = new Date(selectedDate.value)
         const diffTime = selected.getTime() - today.getTime()
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
@@ -218,6 +224,7 @@ const fetchInitialData = async () => {
 
     const policyResponse = await roomService.getWeeklySchedule(props.roomId)
     weeklyScheduleCache.value = policyResponse.data || []
+    effectiveTodayStr.value = policyResponse.effective_today || null
 
     syncActivePolicies()
     await fetchDateReservations()
