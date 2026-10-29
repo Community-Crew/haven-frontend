@@ -5,6 +5,7 @@ import {agendaService} from "@/services/agendaService.js";
 import type {AgendaItem} from "@/types/agendaItem.js";
 import AppLayout from "@/layouts/AppLayout.vue";
 import {useI18n} from "vue-i18n";
+import {sanitizeHtml} from "@/utils/sanitizeHtml";
 
 const {t} = useI18n();
 const route = useRoute()
@@ -134,7 +135,7 @@ const handleBackClick = () => {
           <h4 class="text-xs font-black uppercase text-slate-400 tracking-wide mb-1">{{ $t('agendas.description') }}</h4>
           <div
               class="text-xs text-slate-600 leading-relaxed font-medium [&_p]:mb-2 [&_p:last-child]:mb-0 [&_a]:underline [&_strong]:font-bold [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4"
-              v-html="agendaItem.description"
+              v-html="sanitizeHtml(agendaItem.description)"
           />
         </div>
       </div>
