@@ -52,11 +52,15 @@ router.beforeEach(async (to) => {
     }
 
     if (!profileStore.isInitialized) {
-        try {
-            await profileStore.fetchProfile();
-        } catch (error) {
-            console.error("Router guard failed to fetch profile:", error);
-        }
+        await profileStore.fetchProfile();
+    }
+
+    // Profile couldn't be loaded (API unreachable) - let the page render
+    // rather than guessing the gates below from missing data. The API's own
+    // 403 ACCOUNT_NOT_ACTIVATED / PRIVACY_POLICY_NOT_ACCEPTED responses still
+    // redirect (see services/api.ts), and the next navigation retries.
+    if (!profileStore.profile) {
+        return true;
     }
 
     // Takes priority over activation - always enforced, no bypass, even for
@@ -84,4 +88,47 @@ router.beforeEach(async (to) => {
 
     return true;
 });
+
+// After a deploy, `rsync --delete` removes the previous build's hashed
+// chunks, so a tab still running the old build fails to lazy-load a route
+// ("Failed to fetch dynamically imported module") and renders nothing.
+// Reload once onto the target URL to pick up the new build; the session
+// flag stops a reload loop if the chunk is genuinely broken.
+const CHUNK_RELOAD_KEY = 'chunk-reload-attempted'
+
+const isChunkLoadError = (error: unknown): boolean =>
+    error instanceof Error && /dynamically imported module|Importing a module script failed/i.test(error.message)
+
+const reloadOnce = (url: string): boolean => {
+    try {
+        if (sessionStorage.getItem(CHUNK_RELOAD_KEY)) return false
+        sessionStorage.setItem(CHUNK_RELOAD_KEY, '1')
+    } catch {
+        return false
+    }
+    window.location.assign(url)
+    return true
+}
+
+router.onError((error, to) => {
+    if (isChunkLoadError(error)) {
+        reloadOnce(to.fullPath)
+    }
+})
+
+window.addEventListener('vite:preloadError', (event) => {
+    if (reloadOnce(window.location.href)) {
+        event.preventDefault()
+    }
+})
+
+router.afterEach((_to, _from, failure) => {
+    if (failure) return
+    try {
+        sessionStorage.removeItem(CHUNK_RELOAD_KEY)
+    } catch {
+        // storage unavailable - nothing to reset
+    }
+})
+
 export default router

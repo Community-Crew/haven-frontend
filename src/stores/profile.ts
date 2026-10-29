@@ -35,13 +35,15 @@ export const useProfileStore = defineStore('profile', {
 
     actions: {
         async fetchProfile() {
+            // A failed fetch (network error, API down) keeps whatever profile
+            // was loaded before and leaves isInitialized untouched, so the
+            // router guard retries on the next navigation instead of treating
+            // "couldn't load" as "no profile" (which read as not-activated).
             try {
                 this.profile = await userService.getCurrentUser()
+                this.isInitialized = true
             } catch (error) {
                 console.error('Could not sync user profile metadata from Laravel:', error)
-                this.profile = null
-            } finally {
-                this.isInitialized = true
             }
         },
 
