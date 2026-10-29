@@ -60,6 +60,11 @@
       "room_label": "Ruimte: ",
       "all_rooms": "Alle Ruimtes"
     },
+    "pagination": {
+      "previous": "Vorige",
+      "next": "Volgende",
+      "page_of": "Pagina {current} van {total}"
+    },
     "no_records": "Geen reserveringen gevonden",
     "actions": {
       "save": "Opslaan",
@@ -76,7 +81,40 @@
       "cancelled": "Geannuleerd"
     },
     "private_allocation": "Privéreservering",
-    "success_message": "Reservering is succesvol gemaakt."
+    "success_message": "Reservering is succesvol gemaakt.",
+    "checks": {
+      "check_in_label": "Inchecken",
+      "check_out_label": "Uitchecken",
+      "actions": {
+        "check_in": "Inchecken",
+        "check_out": "Uitchecken",
+        "add_photo": "Nog een foto toevoegen",
+        "submit": "Versturen",
+        "uploading": "Bezig met uploaden..."
+      },
+      "statuses": {
+        "pending": "In beoordeling",
+        "verified": "Geverifieerd",
+        "rejected": "Afgewezen"
+      },
+      "rejection_note_prefix": "Reden: ",
+      "check_in_not_yet_open": "Inchecken kan vanaf 15 minuten voor aanvang van de reservering",
+      "check_in_unavailable": "Deze reservering is afgelopen - inchecken is niet meer mogelijk",
+      "check_out_unavailable": "Check eerst in",
+      "check_out_window_closed": "Uitchecken is niet meer mogelijk",
+      "locked_after_check_in": "Ingecheckt - reservering kan niet meer geannuleerd worden",
+      "example_modal": {
+        "title": "Maak een foto",
+        "description_with_example": "Maak je foto zodat de ruimte eruitziet zoals het voorbeeld hierboven.",
+        "description_no_example": "Maak met je camera een duidelijke, goed belichte foto van de ruimte.",
+        "cancel": "Annuleren",
+        "continue": "Doorgaan"
+      },
+      "error_generic": "Er is iets misgegaan, probeer het opnieuw."
+    },
+    "notes": {
+      "from_management": "Bericht van het beheer: {body}"
+    }
   },
   "public_layout": {
     "brand_name": "",

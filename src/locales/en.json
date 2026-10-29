@@ -60,6 +60,11 @@
       "room_label": "Room: ",
       "all_rooms": "All rooms"
     },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page_of": "Page {current} of {total}"
+    },
     "no_records": "No Reservations Found",
     "actions": {
       "save": "Save",
@@ -76,7 +81,40 @@
       "cancelled": "Cancelled"
     },
     "private_allocation": "Private reservation",
-    "success_message": "Reservations has been made successfully."
+    "success_message": "Reservations has been made successfully.",
+    "checks": {
+      "check_in_label": "Check-in",
+      "check_out_label": "Check-out",
+      "actions": {
+        "check_in": "Check in",
+        "check_out": "Check out",
+        "add_photo": "Add another photo",
+        "submit": "Submit",
+        "uploading": "Uploading..."
+      },
+      "statuses": {
+        "pending": "Pending review",
+        "verified": "Verified",
+        "rejected": "Rejected"
+      },
+      "rejection_note_prefix": "Reason: ",
+      "check_in_not_yet_open": "Check-in opens 15 minutes before the reservation starts",
+      "check_in_unavailable": "This reservation has ended - check-in is no longer possible",
+      "check_out_unavailable": "Check in first",
+      "check_out_window_closed": "Check-out is no longer possible",
+      "locked_after_check_in": "Checked in - booking can no longer be cancelled",
+      "example_modal": {
+        "title": "Take a photo",
+        "description_with_example": "Take your photo so the room looks like the example above.",
+        "description_no_example": "Take a clear, well-lit photo of the room using your camera.",
+        "cancel": "Cancel",
+        "continue": "Continue"
+      },
+      "error_generic": "Something went wrong, please try again."
+    },
+    "notes": {
+      "from_management": "Note from management: {body}"
+    }
   },
   "public_layout": {
     "brand_name": "",
