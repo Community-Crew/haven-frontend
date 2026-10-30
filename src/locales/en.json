@@ -151,7 +151,16 @@
     },
     "actions_title": "Actions",
     "logout_title": "Logout",
-    "logout_description": "Logout of this current session."
+    "logout_description": "Logout of this current session.",
+    "settings_title": "Settings",
+    "settings": {
+      "language": "Language",
+      "theme": "Theme",
+      "theme_system": "System",
+      "theme_light": "Light",
+      "theme_dark": "Dark",
+      "save_failed": "Could not save your settings. Please try again."
+    }
   },
   "public_wip": {
     "badge": "Coming Soon",

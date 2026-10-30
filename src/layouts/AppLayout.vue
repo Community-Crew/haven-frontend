@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import LocaleSwitcher from "@/components/utils/LocaleSwitcher.vue";
 import type { User } from "@/types/user.ts";
 import { userService } from "@/services/userService.ts";
 import ThemeSwitcher from "@/components/utils/ThemeSwitcher.vue";
@@ -71,10 +70,6 @@ const mobileOverflowItems = computed(() =>
         </nav>
 
         <div v-if="!isCollapsed" class="mt-8 px-6 space-y-6">
-          <div>
-            <p class="text-[10px] uppercase font-black tracking-widest text-white/40 mb-2">{{ $t('general.language_label') }}</p>
-            <LocaleSwitcher/>
-          </div>
           <div>
             <p class="text-[10px] uppercase font-black tracking-widest text-white/40 mb-2">{{ $t('general.theme_label') }}</p>
             <ThemeSwitcher/>
@@ -168,10 +163,6 @@ const mobileOverflowItems = computed(() =>
           </div>
 
           <div class="border-t border-white/10 pt-6 space-y-6">
-            <div>
-              <p class="text-[10px] uppercase font-black tracking-widest text-white/40 mb-2">{{ $t('general.language_label') }}</p>
-              <LocaleSwitcher/>
-            </div>
             <div>
               <p class="text-[10px] uppercase font-black tracking-widest text-white/40 mb-2">{{ $t('general.theme_label') }}</p>
               <ThemeSwitcher/>

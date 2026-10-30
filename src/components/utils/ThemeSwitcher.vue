@@ -1,27 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import {applyTheme, isDark} from '@/utils/preferences.ts'
+import {useProfileStore} from '@/stores/profile.ts'
 
-const isDark = ref(false)
-
-const setTheme = (dark: boolean) => {
-  isDark.value = dark
-  if (dark) {
-    document.documentElement.classList.add('dark')
-    localStorage.setItem('theme', 'dark')
-  } else {
-    document.documentElement.classList.remove('dark')
-    localStorage.setItem('theme', 'light')
-  }
-}
+const profileStore = useProfileStore()
 
 const toggleTheme = () => {
-  setTheme(!isDark.value)
+  const theme = isDark.value ? 'light' : 'dark'
+  if (profileStore.profile) {
+    profileStore.updateSettings({theme}).catch((error) => console.error('Could not save theme:', error))
+  } else {
+    applyTheme(theme)
+  }
 }
-
-onMounted(() => {
-  // The initial theme is applied by the inline script in index.html.
-  isDark.value = document.documentElement.classList.contains('dark')
-})
 </script>
 
 <template>

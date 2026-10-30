@@ -130,7 +130,7 @@ onMounted(() => {
         <button
             @click="selectedAgendaSlug = 'all'"
             class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider border-2 border-haven-blue transition-all whitespace-nowrap cursor-pointer transform active:scale-95"
-            :class="selectedAgendaSlug === 'all' ? 'bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue dark:border-haven-yellow shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b]'"
+            :class="selectedAgendaSlug === 'all' ? 'bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue dark:border-haven-yellow shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b] dark:bg-slate-800 dark:text-slate-300 dark:border-white/10 dark:shadow-none'"
         >
           <span>📅</span> <span>{{ $t('agendas.show_all')}}</span>
         </button>
@@ -140,7 +140,7 @@ onMounted(() => {
             :key="agenda.id"
             @click="selectedAgendaSlug = agenda.slug"
             class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider border-2 border-haven-blue transition-all whitespace-nowrap cursor-pointer transform active:scale-95"
-            :class="selectedAgendaSlug === agenda.slug ? 'bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue dark:border-haven-yellow shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b]'"
+            :class="selectedAgendaSlug === agenda.slug ? 'bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue dark:border-haven-yellow shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b] dark:bg-slate-800 dark:text-slate-300 dark:border-white/10 dark:shadow-none'"
         >
           <span>📆</span> <span>{{ agenda.name }}</span>
         </button>
@@ -151,17 +151,17 @@ onMounted(() => {
             v-for="item in visibleItems"
             :key="item.id"
             @click="handleItemClick(item)"
-            class="bg-white border-2 border-haven-blue rounded-2xl overflow-hidden shadow-[4px_4px_0px_0px_#091d4b] flex flex-col cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#091d4b]"
+            class="bg-white dark:bg-slate-800 dark:border-white/10 dark:shadow-none border-2 border-haven-blue rounded-2xl overflow-hidden shadow-[4px_4px_0px_0px_#091d4b] flex flex-col cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#091d4b] dark:hover:shadow-none dark:hover:border-white/20"
         >
           <img
               v-if="item.image_url"
               :src="item.image_url"
               alt="Event cover banner"
-              class="w-full aspect-video object-cover border-b-2 border-haven-blue"
+              class="w-full aspect-video object-cover border-b-2 border-haven-blue dark:border-white/10"
           />
           <div
               v-else
-              :class="[getPlaceholderStyle(item.id).bg, 'w-full aspect-video border-b-2 border-haven-blue flex items-center justify-center p-4']"
+              :class="[getPlaceholderStyle(item.id).bg, 'w-full aspect-video border-b-2 border-haven-blue dark:border-white/10 flex items-center justify-center p-4']"
           >
             <span :class="[getPlaceholderStyle(item.id).text, 'font-black uppercase text-center leading-tight tracking-wide line-clamp-3']">
               {{ item.title }}
@@ -173,17 +173,17 @@ onMounted(() => {
               <span :class="[getAgendaBadgeStyle(item.agenda.id).bg, getAgendaBadgeStyle(item.agenda.id).text, 'inline-block text-[10px] font-black uppercase px-2 py-0.5 rounded-md tracking-wider']">
                 {{ item.agenda.name }}
               </span>
-              <h3 class="text-base font-black text-haven-blue leading-tight">{{ item.title }}</h3>
+              <h3 class="text-base font-black text-haven-blue dark:text-slate-100 leading-tight">{{ item.title }}</h3>
             </div>
 
-            <div class="flex items-center justify-between text-xs font-black text-haven-blue">
+            <div class="flex items-center justify-between text-xs font-black text-haven-blue dark:text-slate-100">
               <span>{{ formatEventDate(item.start_date) }}</span>
-              <span class="text-haven-blue/60 font-bold">{{
+              <span class="text-haven-blue/60 dark:text-slate-400 font-bold">{{
                   formatEventTime(item.start_date, item.end_date)
                 }}</span>
             </div>
 
-            <p class="text-xs text-slate-600 font-medium leading-relaxed flex-1">
+            <p class="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed flex-1">
               {{ item.short_description || stripHtml(item.description) }}
             </p>
           </div>
@@ -198,7 +198,7 @@ onMounted(() => {
         <button
             @click="fetchAgendaData(true)"
             :disabled="isLoadingMore"
-            class="px-6 py-2.5 border-2 border-haven-blue bg-white text-haven-blue text-xs font-black uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_#091d4b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 cursor-pointer"
+            class="px-6 py-2.5 border-2 border-haven-blue bg-white text-haven-blue dark:bg-slate-800 dark:text-slate-300 dark:border-white/10 dark:shadow-none text-xs font-black uppercase tracking-wider rounded-xl shadow-[3px_3px_0px_0px_#091d4b] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-50 cursor-pointer"
         >
           {{ isLoadingMore ? $t('agendas.load_more_loading') : `${$t('agendas.load_more_action')} 🔽` }}
         </button>

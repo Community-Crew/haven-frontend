@@ -21,9 +21,9 @@ const statusLabels: Record<string, string> = {
 
 <template>
   <div
-      class="bg-white rounded-2xl border-2 border-haven-blue overflow-hidden shadow-[4px_4px_0px_0px_#091d4b] flex flex-col justify-between h-full group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#091d4b] transition-all duration-200">
+      class="bg-white dark:bg-slate-800 dark:border-white/10 dark:shadow-none rounded-2xl border-2 border-haven-blue overflow-hidden shadow-[4px_4px_0px_0px_#091d4b] flex flex-col justify-between h-full group hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#091d4b] dark:hover:shadow-none dark:hover:border-white/20 transition-all duration-200">
 
-    <div class="relative h-48 w-full bg-haven-white/40 overflow-hidden shrink-0">
+    <div class="relative h-48 w-full bg-haven-white/40 dark:bg-white/5 overflow-hidden shrink-0">
       <img
           :src="room.image_url"
           :alt="room.name"
@@ -49,19 +49,19 @@ const statusLabels: Record<string, string> = {
       </span>
     </div>
 
-    <div class="p-5 flex-1 flex flex-col justify-between bg-haven-white/40">
+    <div class="p-5 flex-1 flex flex-col justify-between bg-haven-white/40 dark:bg-transparent">
       <div>
         <div class="flex flex-wrap gap-1.5 mb-2">
           <span
-              class="text-[10px] bg-haven-light-blue/20 text-haven-blue font-black px-2 py-0.5 rounded uppercase tracking-wider">
+              class="text-[10px] bg-haven-light-blue/20 text-haven-blue dark:text-haven-light-blue font-black px-2 py-0.5 rounded uppercase tracking-wider">
             📍 {{ room.location }}
           </span>
         </div>
 
-        <h3 class="text-xl font-black text-haven-blue leading-tight mb-1 truncate">
+        <h3 class="text-xl font-black text-haven-blue dark:text-slate-100 leading-tight mb-1 truncate">
           {{ room.name }}
         </h3>
-        <p class="text-xs text-haven-blue/70 line-clamp-2 font-medium leading-relaxed">
+        <p class="text-xs text-haven-blue/70 dark:text-slate-400 line-clamp-2 font-medium leading-relaxed">
           {{ room.description }}
         </p>
       </div>

@@ -1,4 +1,5 @@
 import {privateApi} from './api.ts';
+import type {UserSettings} from '@/types/userSettings.ts';
 
 export const userService = {
     getCurrentUser: async () => {
@@ -9,6 +10,12 @@ export const userService = {
 
     activateAccount: async (code: string) => {
         const response = await privateApi.post('/user/activate', {code});
+
+        return response.data?.data || response.data;
+    },
+
+    updateSettings: async (settings: Partial<UserSettings>): Promise<UserSettings> => {
+        const response = await privateApi.patch('/user/settings', settings);
 
         return response.data?.data || response.data;
     }

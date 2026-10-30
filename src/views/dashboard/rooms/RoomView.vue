@@ -76,26 +76,26 @@ const handleBackClick = () => {
 
       <div v-else-if="roomSpec" class="grid lg:grid-cols-3 gap-8 items-start">
 
-        <div class="lg:col-span-1 bg-white space-y-4 border-2 border-haven-blue rounded-2xl p-6 shadow-[4px_4px_0px_0px_#091d4b]">
+        <div class="lg:col-span-1 bg-white space-y-4 border-2 border-haven-blue rounded-2xl p-6 shadow-[4px_4px_0px_0px_#091d4b] dark:bg-slate-800 dark:border-white/10 dark:shadow-none">
           <div>
-          <span class="text-[10px] font-black uppercase bg-haven-blue/10 text-haven-blue px-2 py-1 rounded-md">
+          <span class="text-[10px] font-black uppercase bg-haven-blue/10 text-haven-blue dark:bg-white/10 dark:text-slate-300 px-2 py-1 rounded-md">
             {{ $t('rooms.label')}}
           </span>
-            <h1 class="text-2xl font-black text-haven-blue uppercase tracking-tight mt-2">
+            <h1 class="text-2xl font-black text-haven-blue dark:text-slate-100 uppercase tracking-tight mt-2">
               {{ roomSpec.name }}
             </h1>
           </div>
 
-          <div class="border-t border-b border-slate-100 py-3 space-y-2">
-            <div class="flex justify-between items-center text-xs font-medium text-slate-500">
+          <div class="border-t border-b border-slate-100 dark:border-white/5 py-3 space-y-2">
+            <div class="flex justify-between items-center text-xs font-medium text-slate-500 dark:text-slate-400">
               <span> {{ $t('rooms.location') }} </span>
-              <span class="font-black text-slate-800">{{ roomSpec.location ?? 'Main Floor' }}</span>
+              <span class="font-black text-slate-800 dark:text-slate-100">{{ roomSpec.location ?? 'Main Floor' }}</span>
             </div>
           </div>
 
           <div>
-            <h4 class="text-xs font-black uppercase text-slate-400 tracking-wide mb-1">{{ $t('rooms.location')}}</h4>
-            <p class="text-xs text-slate-600 leading-relaxed font-medium">
+            <h4 class="text-xs font-black uppercase text-slate-400 dark:text-slate-500 tracking-wide mb-1">{{ $t('rooms.location')}}</h4>
+            <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
               {{
                 roomSpec.description
               }}
