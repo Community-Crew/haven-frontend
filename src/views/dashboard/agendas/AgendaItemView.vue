@@ -95,17 +95,17 @@ const handleBackClick = () => {
       </div>
 
       <div v-else-if="agendaItem"
-           class="bg-white space-y-4 border-2 border-haven-blue rounded-2xl p-6 shadow-[4px_4px_0px_0px_#091d4b]">
+           class="bg-white space-y-4 border-2 border-haven-blue rounded-2xl p-6 shadow-[4px_4px_0px_0px_#091d4b] dark:bg-slate-800 dark:border-white/10 dark:shadow-none">
 
         <img
             v-if="agendaItem.image_url"
             :src="agendaItem.image_url"
             alt="Event cover banner"
-            class="w-full aspect-video object-cover rounded-xl border border-haven-blue/20"
+            class="w-full aspect-video object-cover rounded-xl border border-haven-blue/20 dark:border-white/10"
         />
         <div
             v-else
-            :class="[getPlaceholderStyle(agendaItem.id).bg, 'w-full aspect-video rounded-xl border border-haven-blue/20 flex items-center justify-center p-6']"
+            :class="[getPlaceholderStyle(agendaItem.id).bg, 'w-full aspect-video rounded-xl border border-haven-blue/20 dark:border-white/10 flex items-center justify-center p-6']"
         >
           <span :class="[getPlaceholderStyle(agendaItem.id).text, 'font-black uppercase text-center leading-tight tracking-wide text-xl line-clamp-3']">
             {{ agendaItem.title }}
@@ -113,28 +113,28 @@ const handleBackClick = () => {
         </div>
 
         <div class="flex items-start justify-between space-x-4">
-          <h1 class="text-2xl font-black text-haven-blue uppercase tracking-tight">
+          <h1 class="text-2xl font-black text-haven-blue dark:text-slate-100 uppercase tracking-tight">
             {{ agendaItem.title }}
           </h1>
           <div class="text-right shrink-0">
-            <p class="text-xs font-black text-haven-blue">{{ formatEventDate(agendaItem.start_date) }}</p>
-            <p class="text-xs font-bold text-haven-blue/60">
+            <p class="text-xs font-black text-haven-blue dark:text-slate-100">{{ formatEventDate(agendaItem.start_date) }}</p>
+            <p class="text-xs font-bold text-haven-blue/60 dark:text-slate-400">
               {{ formatEventTime(agendaItem.start_date, agendaItem.end_date) }}
             </p>
           </div>
         </div>
 
-        <div v-if="agendaItem.host" class="border-t border-b border-slate-100 py-3">
-          <div class="flex justify-between items-center text-xs font-medium text-slate-500">
+        <div v-if="agendaItem.host" class="border-t border-b border-slate-100 dark:border-white/5 py-3">
+          <div class="flex justify-between items-center text-xs font-medium text-slate-500 dark:text-slate-400">
             <span>{{ $t('agendas.host') }}</span>
-            <span class="font-black text-slate-800">{{ agendaItem.host }}</span>
+            <span class="font-black text-slate-800 dark:text-slate-100">{{ agendaItem.host }}</span>
           </div>
         </div>
 
         <div>
-          <h4 class="text-xs font-black uppercase text-slate-400 tracking-wide mb-1">{{ $t('agendas.description') }}</h4>
+          <h4 class="text-xs font-black uppercase text-slate-400 dark:text-slate-500 tracking-wide mb-1">{{ $t('agendas.description') }}</h4>
           <div
-              class="text-xs text-slate-600 leading-relaxed font-medium [&_p]:mb-2 [&_p:last-child]:mb-0 [&_a]:underline [&_strong]:font-bold [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4"
+              class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium [&_p]:mb-2 [&_p:last-child]:mb-0 [&_a]:underline [&_strong]:font-bold [&_ul]:list-disc [&_ul]:pl-4 [&_ol]:list-decimal [&_ol]:pl-4"
               v-html="sanitizeHtml(agendaItem.description)"
           />
         </div>

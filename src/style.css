@@ -27,6 +27,11 @@
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     }
 
+    /* Native scrollbars, date pickers and form controls follow the theme too. */
+    html.dark {
+        color-scheme: dark;
+    }
+
     html.dark, html.dark body, html.dark #app {
         background-color: var(--color-haven-blue);
         color: var(--color-haven-white);
