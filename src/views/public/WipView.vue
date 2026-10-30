@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
+import BuiltBy from "@/components/utils/BuiltBy.vue";
 
 const router = useRouter();
 
@@ -49,6 +50,10 @@ const enterPortal = () => {
         {{ $t('public_wip.portal.action') }}
       </button>
     </div>
+
+    <p class="mt-10 text-xs font-semibold text-slate-400 dark:text-slate-500">
+      <BuiltBy/>
+    </p>
 
   </div>
 </template>

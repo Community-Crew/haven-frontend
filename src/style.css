@@ -27,6 +27,11 @@
         font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     }
 
+    html.dark, html.dark body, html.dark #app {
+        background-color: var(--color-haven-blue);
+        color: var(--color-haven-white);
+    }
+
     .webkit-scrolling-touch {
         -webkit-overflow-scrolling: touch;
     }

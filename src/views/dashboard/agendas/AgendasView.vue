@@ -121,7 +121,7 @@ onMounted(() => {
 
 
       <div v-if="isLoading && agendasList.length === 0"
-           class="text-center py-20 font-black text-haven-blue/30 animate-pulse text-sm">
+           class="text-center py-20 font-black text-haven-blue/30 dark:text-haven-white/40 animate-pulse text-sm">
         {{ $t('general.loading') }}
       </div>
 
@@ -130,7 +130,7 @@ onMounted(() => {
         <button
             @click="selectedAgendaSlug = 'all'"
             class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider border-2 border-haven-blue transition-all whitespace-nowrap cursor-pointer transform active:scale-95"
-            :class="selectedAgendaSlug === 'all' ? 'bg-haven-blue text-white shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b]'"
+            :class="selectedAgendaSlug === 'all' ? 'bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue dark:border-haven-yellow shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b]'"
         >
           <span>📅</span> <span>{{ $t('agendas.show_all')}}</span>
         </button>
@@ -140,7 +140,7 @@ onMounted(() => {
             :key="agenda.id"
             @click="selectedAgendaSlug = agenda.slug"
             class="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider border-2 border-haven-blue transition-all whitespace-nowrap cursor-pointer transform active:scale-95"
-            :class="selectedAgendaSlug === agenda.slug ? 'bg-haven-blue text-white shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b]'"
+            :class="selectedAgendaSlug === agenda.slug ? 'bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue dark:border-haven-yellow shadow-none translate-x-0.5 translate-y-0.5' : 'bg-white text-haven-blue shadow-[3px_3px_0px_0px_#091d4b]'"
         >
           <span>📆</span> <span>{{ agenda.name }}</span>
         </button>

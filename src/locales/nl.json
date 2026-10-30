@@ -13,6 +13,7 @@
     "not_applicable": "n.v.t",
     "darkmode_beta": "Darkmode is in Beta",
     "theme_label": "Thema",
+    "built_by": "Gemaakt met {heart} in Eindhoven door {name}",
     "logout": "Uitloggen"
   },
   "rooms": {
