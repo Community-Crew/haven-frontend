@@ -34,7 +34,7 @@ const mobileOverflowItems = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col md:flex-row h-screen w-screen bg-haven-white dark:bg-haven-blue select-none overflow-hidden text-haven-black">
+  <div class="flex flex-col md:flex-row h-dvh w-full bg-haven-white dark:bg-haven-blue select-none overflow-hidden text-haven-black">
 
     <aside
         class="hidden md:flex flex-col bg-haven-blue text-white justify-between transition-all duration-300 ease-in-out relative border-r border-white/5 z-20"
@@ -143,7 +143,7 @@ const mobileOverflowItems = computed(() =>
         leave-from-class="translate-y-0 opacity-100"
         leave-to-class="translate-y-full opacity-0"
     >
-      <div v-if="isMoreMenuOpen" class="md:hidden fixed inset-0 bg-haven-blue text-white z-40 p-6 flex flex-col justify-between pt-20">
+      <div v-if="isMoreMenuOpen" class="md:hidden fixed inset-x-0 top-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] bg-haven-blue text-white z-40 p-6 flex flex-col justify-between pt-[calc(5rem+env(safe-area-inset-top))]">
 
         <div class="flex flex-col flex-1 overflow-y-auto">
           <div class="flex justify-between items-center mb-6">
@@ -215,7 +215,7 @@ const mobileOverflowItems = computed(() =>
       <button
           @click="isMoreMenuOpen = !isMoreMenuOpen"
           class="flex flex-col items-center text-xs text-slate-500 cursor-pointer"
-          :class="isMoreMenuOpen ? 'text-haven-yellow font-black' : ''"
+          :class="isMoreMenuOpen ? 'text-haven-blue font-bold' : ''"
       >
         <span class="text-xl">✨</span>
         <span>{{ isMoreMenuOpen ? 'Close' : 'More' }}</span>
