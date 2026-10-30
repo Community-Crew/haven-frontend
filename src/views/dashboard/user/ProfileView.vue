@@ -1,12 +1,31 @@
 <script setup lang="ts">
-import {computed} from 'vue'
+import {computed, ref} from 'vue'
 import {useProfileStore} from '@/stores/profile'
 import {logout} from '@/services/keycloak'
 import AppLayout from "@/layouts/AppLayout.vue"
+import type {Locale, Theme, UserSettings} from '@/types/userSettings.ts'
 
 const profileStore = useProfileStore()
 
 const userProfile = computed(() => profileStore.profile)
+
+const locales: { value: Locale, label: string }[] = [
+  {value: 'nl', label: 'Nederlands'},
+  {value: 'en', label: 'English'},
+]
+const themes: Theme[] = ['system', 'light', 'dark']
+
+const settingsError = ref(false)
+
+async function updateSetting(changes: Partial<UserSettings>) {
+  settingsError.value = false
+  try {
+    await profileStore.updateSettings(changes)
+  } catch (error) {
+    console.error('Could not save settings:', error)
+    settingsError.value = true
+  }
+}
 
 const formattedActivationDate = computed(() => {
   if (!userProfile.value?.activated_at) return '—'
@@ -92,6 +111,58 @@ async function handleLogout() {
               </div>
               <br/>
             </div>
+          </div>
+
+          <div class="bg-white/40 rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 bg-white/60">
+              <h3 class="font-black text-sm text-haven-blue tracking-wide uppercase">
+                {{ $t('profile.settings_title') }}
+              </h3>
+            </div>
+
+            <div class="divide-y divide-gray-100 px-6 py-2 text-xs md:text-sm">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 py-3 sm:items-center">
+                <span class="text-haven-blue/50 font-semibold">{{ $t('profile.settings.language') }}</span>
+                <div class="sm:col-span-2 flex flex-wrap gap-2">
+                  <button
+                      v-for="option in locales"
+                      :key="option.value"
+                      type="button"
+                      @click="updateSetting({locale: option.value})"
+                      :aria-pressed="userProfile?.settings?.locale === option.value"
+                      class="px-3 py-1.5 rounded-lg text-xs font-black border transition-colors cursor-pointer"
+                      :class="userProfile?.settings?.locale === option.value
+                        ? 'bg-haven-blue text-white border-haven-blue'
+                        : 'bg-haven-blue/5 text-haven-blue border-haven-blue/10 hover:bg-haven-blue/10'"
+                  >
+                    {{ option.label }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 py-3 sm:items-center">
+                <span class="text-haven-blue/50 font-semibold">{{ $t('profile.settings.theme') }}</span>
+                <div class="sm:col-span-2 flex flex-wrap gap-2">
+                  <button
+                      v-for="theme in themes"
+                      :key="theme"
+                      type="button"
+                      @click="updateSetting({theme})"
+                      :aria-pressed="userProfile?.settings?.theme === theme"
+                      class="px-3 py-1.5 rounded-lg text-xs font-black border transition-colors cursor-pointer"
+                      :class="userProfile?.settings?.theme === theme
+                        ? 'bg-haven-blue text-white border-haven-blue'
+                        : 'bg-haven-blue/5 text-haven-blue border-haven-blue/10 hover:bg-haven-blue/10'"
+                  >
+                    {{ $t(`profile.settings.theme_${theme}`) }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <p v-if="settingsError" class="px-6 pb-4 text-xs font-bold text-haven-red">
+              {{ $t('profile.settings.save_failed') }}
+            </p>
           </div>
 
           <div class="bg-white/40 dark:bg-haven-white/40 rounded-2xl border border-red-100 shadow-sm overflow-hidden">

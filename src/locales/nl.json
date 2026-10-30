@@ -151,7 +151,16 @@
     },
     "actions_title": "Acties",
     "logout_title": "Uitloggen",
-    "logout_description": "Log de huidige sessie uit."
+    "logout_description": "Log de huidige sessie uit.",
+    "settings_title": "Instellingen",
+    "settings": {
+      "language": "Taal",
+      "theme": "Thema",
+      "theme_system": "Systeem",
+      "theme_light": "Licht",
+      "theme_dark": "Donker",
+      "save_failed": "Je instellingen konden niet worden opgeslagen. Probeer het opnieuw."
+    }
   },
   "public_wip": {
     "badge": "Binnenkort Beschikbaar",
