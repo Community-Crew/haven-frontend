@@ -111,7 +111,8 @@
         "cancel": "Cancel",
         "continue": "Continue"
       },
-      "error_generic": "Something went wrong, please try again."
+      "error_generic": "Something went wrong, please try again.",
+      "error_too_large": "Your photos are too large to upload. Try fewer photos at once."
     },
     "notes": {
       "from_management": "Note from management: {body}"
