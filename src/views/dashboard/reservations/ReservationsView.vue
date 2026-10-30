@@ -219,10 +219,15 @@ const takePhoto = async (res: Reservation, type: 'check_in' | 'check_out') => {
   let photo;
 
   try {
+    // Scaled down on the device: full-resolution camera photos are several
+    // MB each, which made uploads slow and ran into the API's request size
+    // limit. The API stores at most 2000px anyway (Media::MAX_DIMENSION).
     photo = await Camera.getPhoto({
       resultType: CameraResultType.Uri,
       source: CameraSource.Camera,
-      quality: 85,
+      quality: 80,
+      width: 2000,
+      height: 2000,
     });
   } catch {
     return;
@@ -286,9 +291,14 @@ const submitPendingPhotos = async (res: Reservation, type: 'check_in' | 'check_o
             .filter(key => key === 'photos' || key.startsWith('photos.'))
             .flatMap(key => validationErrors[key])
         : [];
+    // 413 comes from the web server, before Laravel, as an HTML page - so
+    // there's no JSON message to show.
+    const fallback = error.response?.status === 413
+        ? t('reservations.checks.error_too_large')
+        : t('reservations.checks.error_generic');
     checkErrors.value = {
       ...checkErrors.value,
-      [res.id]: photosErrors[0] || error.response?.data?.message || t('reservations.checks.error_generic'),
+      [res.id]: photosErrors[0] || error.response?.data?.message || fallback,
     };
   } finally {
     submittingCheckKey.value = null;

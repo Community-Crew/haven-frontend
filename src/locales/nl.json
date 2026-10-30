@@ -111,7 +111,8 @@
         "cancel": "Annuleren",
         "continue": "Doorgaan"
       },
-      "error_generic": "Er is iets misgegaan, probeer het opnieuw."
+      "error_generic": "Er is iets misgegaan, probeer het opnieuw.",
+      "error_too_large": "Je foto's zijn te groot om te uploaden. Probeer minder foto's tegelijk."
     },
     "notes": {
       "from_management": "Bericht van het beheer: {body}"

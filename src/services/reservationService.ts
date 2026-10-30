@@ -7,6 +7,10 @@ import type {
     ReservationQueryParams
 } from "@/types/reservations.ts";
 
+// Photo uploads can take a while on mobile data - the default 10s API
+// timeout cut them off.
+const PHOTO_UPLOAD_TIMEOUT = 60000;
+
 export const reservationService = {
     /**
      * Create a new room reservation
@@ -52,7 +56,8 @@ export const reservationService = {
         photos.forEach(photo => formData.append('photos[]', photo));
 
         const response = await privateApi.post(`/reservations/${id}/check-in`, formData, {
-            headers: {'Content-Type': undefined}
+            headers: {'Content-Type': undefined},
+            timeout: PHOTO_UPLOAD_TIMEOUT,
         });
         return response.data;
     },
@@ -65,7 +70,8 @@ export const reservationService = {
         photos.forEach(photo => formData.append('photos[]', photo));
 
         const response = await privateApi.post(`/reservations/${id}/check-out`, formData, {
-            headers: {'Content-Type': undefined}
+            headers: {'Content-Type': undefined},
+            timeout: PHOTO_UPLOAD_TIMEOUT,
         });
         return response.data;
     },
