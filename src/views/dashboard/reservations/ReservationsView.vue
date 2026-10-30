@@ -368,7 +368,7 @@ watch([activeTimeline, activeStatus, selectedRoomSlug], () => {
         <div
             v-for="res in reservations"
             :key="res.id"
-            class="bg-white border-2 border-haven-blue rounded-2xl p-6 shadow-[4px_4px_0px_0px_#091d4b] flex flex-col justify-between transition-all duration-200 relative group"
+            class="bg-white dark:bg-slate-800 border-2 border-haven-blue dark:border-white/10 rounded-2xl p-6 shadow-[4px_4px_0px_0px_#091d4b] dark:shadow-none flex flex-col justify-between transition-all duration-200 relative group"
         >
           <div class="space-y-5">
             <div class="flex items-center justify-between">

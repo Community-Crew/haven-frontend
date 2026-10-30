@@ -53,7 +53,7 @@ const handleBackClick = () => {
     <div class="max-w-6xl mx-auto p-4 sm:p-6 md:p-8 space-y-6">
       <button
           @click="handleBackClick"
-          class="text-xs font-black uppercase text-haven-blue/70 hover:text-haven-blue transition-colors flex items-center gap-1 cursor-pointer"
+          class="text-xs font-black uppercase text-haven-blue/70 hover:text-haven-blue dark:text-haven-white/70 dark:hover:text-haven-white transition-colors flex items-center gap-1 cursor-pointer"
       >
          {{ $t('general.back') }}
       </button>

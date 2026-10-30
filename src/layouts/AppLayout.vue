@@ -199,14 +199,14 @@ const mobileOverflowItems = computed(() =>
       </div>
     </Transition>
 
-    <nav class="md:hidden flex justify-around items-center border-t border-haven-blue/10 bg-white pb-[env(safe-area-inset-bottom)] h-16 box-content z-50 relative">
+    <nav class="md:hidden flex justify-around items-center border-t border-haven-blue/10 dark:border-white/10 bg-white dark:bg-haven-blue pb-[env(safe-area-inset-bottom)] h-16 box-content z-50 relative">
       <router-link
           v-for="item in mobilePrimaryItems"
           :key="item.to"
           :to="{ name: item.to }"
           @click="closeMoreMenu"
-          class="flex flex-col items-center text-xs text-slate-500"
-          active-class="text-haven-blue font-bold"
+          class="flex flex-col items-center text-xs text-slate-500 dark:text-white/60"
+          active-class="text-haven-blue! dark:text-haven-yellow! font-bold"
       >
         <span class="text-xl">{{ item.icon }}</span>
         <span>{{ $t(item.labelKey) }}</span>
@@ -214,8 +214,8 @@ const mobileOverflowItems = computed(() =>
 
       <button
           @click="isMoreMenuOpen = !isMoreMenuOpen"
-          class="flex flex-col items-center text-xs text-slate-500 cursor-pointer"
-          :class="isMoreMenuOpen ? 'text-haven-blue font-bold' : ''"
+          class="flex flex-col items-center text-xs text-slate-500 dark:text-white/60 cursor-pointer"
+          :class="isMoreMenuOpen ? 'text-haven-blue! dark:text-haven-yellow! font-bold' : ''"
       >
         <span class="text-xl">✨</span>
         <span>{{ isMoreMenuOpen ? 'Close' : 'More' }}</span>
