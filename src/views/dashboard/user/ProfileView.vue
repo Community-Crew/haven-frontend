@@ -96,10 +96,10 @@ async function handleLogout() {
                 </span>
               </div>
               <div class="grid grid-cols-3 py-2 items-center">
-                <span class="text-haven-blue/50 font-semibold">{{ $t('profile.unit.floor') ?? $t('general.not_applicable') }}</span>
+                <span class="text-haven-blue/50 font-semibold">{{ $t('profile.unit.floor') }}</span>
                 <span
                     class="col-span-2 font-black text-haven-blue bg-haven-blue/5 border border-haven-blue/10 px-2 py-0.5 rounded-lg w-max font-mono text-xs">
-                  {{ (userProfile?.unit?.floor) ?? 'N/A' }}
+                  {{ userProfile?.unit?.floor ?? $t('general.not_applicable') }}
                 </span>
               </div>
               <div class="grid grid-cols-3 py-2 items-center">
