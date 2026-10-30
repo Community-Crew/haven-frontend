@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BuiltBy from "@/components/utils/BuiltBy.vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
@@ -102,6 +103,7 @@ const navigateHome = () => {
 
     <footer class="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 border-t border-slate-200/40 dark:border-white/5 text-center text-xs font-semibold text-slate-400 dark:text-slate-500">
       <p>&copy; {{ new Date().getFullYear() }} {{ $t('public_layout.brand_name') }}. {{ $t('public_layout.footer_all_rights') }}.</p>
+      <p class="mt-1"><BuiltBy/></p>
     </footer>
 
   </div>

@@ -4,6 +4,7 @@ import LocaleSwitcher from "@/components/utils/LocaleSwitcher.vue";
 import type { User } from "@/types/user.ts";
 import { userService } from "@/services/userService.ts";
 import ThemeSwitcher from "@/components/utils/ThemeSwitcher.vue";
+import BuiltBy from "@/components/utils/BuiltBy.vue";
 import { navigationItems } from "@/config/navigation.ts";
 import packageInfo from '../../package.json' // 🏷️ Import your package JSON to grab the version
 
@@ -96,8 +97,9 @@ const mobileOverflowItems = computed(() =>
           </div>
         </router-link>
 
-        <div v-if="!isCollapsed" class="px-6 pb-3 text-[9px] font-mono font-bold text-white/30 tracking-wider">
-          {{ appVersion }}
+        <div v-if="!isCollapsed" class="px-6 pb-3 flex flex-col gap-0.5 text-[9px] font-bold text-white/30">
+          <span class="font-mono tracking-wider">{{ appVersion }}</span>
+          <BuiltBy/>
         </div>
       </div>
     </aside>
@@ -191,8 +193,10 @@ const mobileOverflowItems = computed(() =>
             <span class="text-white/40 text-sm">➔</span>
           </router-link>
 
-          <div class="text-center text-[10px] font-mono font-bold text-white/20 tracking-widest pt-1">
-            {{ appVersion }}
+          <div class="text-center text-[10px] font-bold text-white/30 pt-1">
+            <span class="font-mono tracking-widest">{{ appVersion }}</span>
+            <span class="mx-1.5">·</span>
+            <BuiltBy/>
           </div>
         </div>
 
