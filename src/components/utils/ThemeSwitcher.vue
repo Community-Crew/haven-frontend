@@ -19,14 +19,8 @@ const toggleTheme = () => {
 }
 
 onMounted(() => {
-  const savedTheme = localStorage.getItem('theme')
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-
-  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-    setTheme(true)
-  } else {
-    setTheme(false)
-  }
+  // The initial theme is applied by the inline script in index.html.
+  isDark.value = document.documentElement.classList.contains('dark')
 })
 </script>
 
