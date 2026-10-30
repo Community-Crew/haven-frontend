@@ -3,7 +3,10 @@
     "home": "Home",
     "rooms": "Rooms",
     "agenda": "Agenda",
-    "reservations": "Reservations"
+    "reservations": "Reservations",
+    "more": "More",
+    "close": "Close",
+    "more_menu_title": "Features & Settings"
   },
   "general": {
     "loading": "Fetching objects...",
