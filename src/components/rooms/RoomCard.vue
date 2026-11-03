@@ -31,13 +31,13 @@ const statusLabels: Record<string, string> = {
       />
 
       <span
-          class="absolute top-3 left-3 text-white text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1.5 transition-colors"
+          class="absolute top-3 left-3  text-xs font-black px-3 py-1 rounded-full shadow-md flex items-center gap-1.5 transition-colors "
           :class="{
-          'bg-haven-green': room.status === 'available',
-          'bg-haven-blue': room.status === 'occupied',
-          'bg-haven-light-blue': room.status === 'reserved',
-          'bg-haven-red': room.status === 'maintenance',
-          'bg-haven-yellow text-haven-blue': room.status === 'cleaning',
+          'bg-haven-green text-white': room.status === 'available',
+          'bg-haven-blue text-white': room.status === 'occupied',
+          'bg-haven-light-blue text-white': room.status === 'reserved',
+          'bg-haven-red text-white': room.status === 'maintenance',
+          'bg-haven-yellow text-stone-800': room.status === 'cleaning',
         }"
       >
         <span
