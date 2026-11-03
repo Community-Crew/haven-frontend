@@ -4,8 +4,7 @@ import './style.css'
 
 import App from './App.vue'
 import router from './router'
-import {initKeycloak, authState} from './services/keycloak'
-import {useProfileStore} from '@/stores/profile'
+import {initKeycloak} from './services/keycloak'
 import {i18n} from "@/i18n.ts"
 
 const app = createApp(App)
@@ -13,34 +12,23 @@ const app = createApp(App)
 app.use(i18n)
 app.use(createPinia())
 
+const mountApp = async () => {
+    // The router guard handles everything auth-dependent from here: it
+    // starts login() for a private route when signed out, and loads the
+    // profile (see stores/profile.ts) before checking the account gates.
+    app.use(router)
+    await router.isReady()
+    app.mount('#app')
+}
+
 initKeycloak()
-    .then(async () => {
-        const profileStore = useProfileStore()
-
-        if (!authState.isAuthenticated) {
-            console.warn('Keycloak session invalid on boot.')
-            app.use(router)
-            await router.isReady()
-            // The router guard's login() call takes over for a private
-            // route (see router/index.ts); for a public one (e.g. "/" or
-            // "/privacy-policy") this just renders normally, which was
-            // broken before - the app never used to mount at all here, so
-            // public pages never rendered for a signed-out visitor.
-            app.mount('#app')
-            return
-        }
-
-        try {
-            await profileStore.fetchProfile()
-        } catch (error) {
-            console.error('Could not sync user profile metadata from Laravel:', error)
-            profileStore.clearProfile()
-        }
-
-        app.use(router)
-        await router.isReady()
-        app.mount('#app')
-    })
     .catch((error) => {
-        console.error('Application failed to start due to Auth error:', error)
+        // Never leave the page unmounted over an auth failure - start
+        // signed out instead, so public pages still render and private
+        // ones fall through to login().
+        console.error('Keycloak init failed, continuing signed out:', error)
+    })
+    .then(mountApp)
+    .catch((error) => {
+        console.error('Application failed to start:', error)
     })
