@@ -56,12 +56,16 @@ export function useProofOfWork() {
         }
 
         const current = (async () => {
-            const {challenge, difficulty, min_age, expires_in} = await reservationService.getChallenge()
+            // 404: a backend from before the proof of work - book without it.
+            const issued = await reservationService.getChallenge()
+                .catch(err => err?.response?.status === 404 ? null : Promise.reject(err))
 
             // Proof of work switched off on the backend.
-            if (difficulty === 0) {
+            if (!issued || issued.difficulty === 0) {
                 return null
             }
+
+            const {challenge, difficulty, min_age, expires_in} = issued
 
             const issuedAt = Date.now()
             // A minute's margin, so a booking submitted right at the end
