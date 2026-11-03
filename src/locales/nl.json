@@ -41,6 +41,13 @@
     "error_fallback": "Er is iets misgegaan bij het reserveren van de ruimte!",
     "past_slot": "Verstreken"
   },
+  "room_policy": {
+    "title": "Wanneer kun je deze ruimte reserveren?",
+    "advance": "Je kunt tot {days} dag vooruit reserveren. | Je kunt tot {days} dagen vooruit reserveren.",
+    "all_day": "Hele dag",
+    "closed": "Niet te reserveren",
+    "not_bookable": "Je kunt deze ruimte niet reserveren."
+  },
   "room_status": {
     "available": "Beschikbaar",
     "occupied": "Bezet",

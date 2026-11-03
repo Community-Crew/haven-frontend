@@ -25,6 +25,15 @@ export const reservationService = {
     },
 
     /**
+     * Fetch a proof-of-work challenge to solve before creating a reservation
+     * - see composables/useProofOfWork.ts
+     */
+    getChallenge: async (): Promise<{ challenge: string; difficulty: number; min_age: number; expires_in: number }> => {
+        const response = await privateApi.post('/reservations/challenge');
+        return response.data.data;
+    },
+
+    /**
      * Fetch the current logged-in user's reservations
      */
     getMyReservations: async (params?: ReservationQueryParams): Promise<PaginatedReservations> => {

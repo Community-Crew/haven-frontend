@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { reservationService } from '@/services/reservationService'
+import { isProofOfWorkError, useProofOfWork } from '@/composables/useProofOfWork'
 import { roomService } from "@/services/roomService.ts"
 import type { Reservation } from '@/types/reservations'
 import {
@@ -48,6 +49,10 @@ const effectiveTodayStr = ref<string | null>(null)
 const selectedSlots = ref<string[]>([])
 const reservationName = ref('')
 const shareName = ref<boolean>(true)
+
+// Solved in the background while the resident picks a slot - see useProofOfWork.
+const proofOfWork = useProofOfWork()
+onMounted(() => proofOfWork.prepare())
 
 const isLoading = ref(false)
 const isSubmitting = ref(false)
@@ -331,13 +336,22 @@ const handleBookingSubmit = async () => {
     isError.value = false
     feedbackMessage.value = null
 
-    await reservationService.createReservation({
+    const payload = {
       room_id: props.roomId,
       name: reservationName.value.trim(),
       start_at: computedTimeBounds.value.start_at,
       end_at: computedTimeBounds.value.end_at,
       share_name: shareName.value
-    })
+    }
+
+    try {
+      await reservationService.createReservation({ ...payload, ...await proofOfWork.take() })
+    } catch (err: any) {
+      // Expired or already used (e.g. the page was left open for a long
+      // time): once more with a fresh solution before giving up.
+      if (!isProofOfWorkError(err)) throw err
+      await reservationService.createReservation({ ...payload, ...await proofOfWork.take() })
+    }
 
     feedbackMessage.value = t('reservations.success_message')
     selectedSlots.value = []
