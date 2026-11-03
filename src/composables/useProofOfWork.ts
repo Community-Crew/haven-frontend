@@ -6,6 +6,50 @@ export interface ProofOfWorkFields {
     pow_nonce?: number
 }
 
+/**
+ * Logs solve times to the console - always in the Vite dev server, and
+ * anywhere else (test environment, production) after
+ * localStorage.setItem('haven:debug-pow', '1') in the browser console.
+ * Also exposes window.havenPowBenchmark(difficulty, runs) there.
+ */
+const debug = (() => {
+    if (import.meta.env.DEV) {
+        return true
+    }
+
+    try {
+        return localStorage.getItem('haven:debug-pow') === '1'
+    } catch {
+        return false
+    }
+})()
+
+const log = (...args: unknown[]) => {
+    if (debug) {
+        console.info('[PoW]', ...args)
+    }
+}
+
+if (debug && typeof window !== 'undefined') {
+    // Solve `runs` random challenges at `difficulty` in this browser, on the
+    // main thread (the app itself uses a worker) - for picking a difficulty.
+    (window as any).havenPowBenchmark = async (difficulty = 16, runs = 5) => {
+        const {solveProofOfWork} = await import('@/utils/proofOfWork')
+        const times: number[] = []
+
+        for (let i = 0; i < runs; i++) {
+            const start = performance.now()
+            await solveProofOfWork(`benchmark-${i}-${Math.random()}`, difficulty)
+            times.push(Math.round(performance.now() - start))
+        }
+
+        times.sort((a, b) => a - b)
+        log(`benchmark difficulty ${difficulty}: ${times.join(', ')} ms (median ${times[Math.floor(times.length / 2)]} ms)`)
+
+        return times
+    }
+}
+
 interface Solved {
     challenge: string
     nonce: number
@@ -62,6 +106,8 @@ export function useProofOfWork() {
 
             // Proof of work switched off on the backend.
             if (!issued || issued.difficulty === 0) {
+                log(issued ? 'switched off on the backend (difficulty 0)' : 'backend has no challenge endpoint yet - booking without')
+
                 return null
             }
 
@@ -72,7 +118,10 @@ export function useProofOfWork() {
             // doesn't arrive just after the backend stopped accepting it.
             refreshTimer = setTimeout(prepare, Math.max(expires_in - 60, 30) * 1000)
 
+            const started = performance.now()
             const nonce = await solveInWorker(challenge, difficulty)
+            const took = performance.now() - started
+            log(`difficulty ${difficulty}: solved after ${nonce + 1} hashes in ${Math.round(took)} ms (~${Math.round((nonce + 1) / (took / 1000))} hashes/s)`)
             worker?.terminate()
             worker = null
             rejectSolve = null
@@ -125,6 +174,7 @@ export function useProofOfWork() {
         const wait = result.usableAt - Date.now()
 
         if (wait > 0) {
+            log(`waiting ${wait} ms for the minimum age before submitting`)
             await new Promise(resolve => setTimeout(resolve, wait))
         }
 
