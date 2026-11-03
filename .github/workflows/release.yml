@@ -78,11 +78,15 @@ jobs:
       # ----------------------------------------------------------------
       # 5. GENERATE GITHUB RELEASE & UPLOAD ASSETS
       # ----------------------------------------------------------------
-      - name: Publish Release to GitHub
+      # GitHub's immutable-releases policy blocks uploading assets to a
+      # release once it's published, so create it as a draft first (drafts
+      # accept asset uploads), then publish it as a separate step below.
+      - name: Create Draft Release & Upload Assets
         uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ github.ref_name }}
           generate_release_notes: true # Automatically reads commit messages to compile a changelog
+          draft: true
 
           # Determines if this build is a Beta.
           # Evaluates to true if the tag contains '-beta' or '-rc'
@@ -92,3 +96,8 @@ jobs:
           files: |
             web-client-*.zip
             android-client-*.apk
+
+      - name: Publish Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ github.ref_name }}" --draft=false --repo "${{ github.repository }}"

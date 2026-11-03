@@ -3,7 +3,10 @@
     "home": "Home",
     "rooms": "Rooms",
     "agenda": "Agenda",
-    "reservations": "Reservations"
+    "reservations": "Reservations",
+    "more": "More",
+    "close": "Close",
+    "more_menu_title": "Features & Settings"
   },
   "general": {
     "loading": "Fetching objects...",
@@ -13,6 +16,7 @@
     "not_applicable": "N/A",
     "darkmode_beta": "Dark mode is in beta.",
     "theme_label": "Theme",
+    "built_by": "Built with {heart} in Eindhoven by {name}",
     "logout": "Logout"
   },
   "rooms": {
@@ -40,6 +44,13 @@
     "error_fallback": "Something went wrong with reserving the room!",
     "past_slot": "Passed"
   },
+  "room_policy": {
+    "title": "When can you book this room?",
+    "advance": "You can book up to {days} day in advance. | You can book up to {days} days in advance.",
+    "all_day": "All day",
+    "closed": "Not bookable",
+    "not_bookable": "You can't book this room."
+  },
   "room_status": {
     "available": "Available",
     "occupied": "Occupied",
@@ -60,6 +71,11 @@
       "room_label": "Room: ",
       "all_rooms": "All rooms"
     },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page_of": "Page {current} of {total}"
+    },
     "no_records": "No Reservations Found",
     "actions": {
       "save": "Save",
@@ -76,7 +92,42 @@
       "cancelled": "Cancelled"
     },
     "private_allocation": "Private reservation",
-    "success_message": "Reservations has been made successfully."
+    "success_message": "Reservations has been made successfully.",
+    "checks": {
+      "check_in_label": "Check-in",
+      "check_out_label": "Check-out",
+      "actions": {
+        "check_in": "Check in",
+        "check_out": "Check out",
+        "add_photo": "Add another photo",
+        "submit": "Submit",
+        "uploading": "Uploading..."
+      },
+      "statuses": {
+        "pending": "Pending review",
+        "verified": "Verified",
+        "rejected": "Rejected"
+      },
+      "rejection_note_prefix": "Reason: ",
+      "check_in_not_yet_open": "Check-in opens 15 minutes before the reservation starts",
+      "check_in_unavailable": "This reservation has ended - check-in is no longer possible",
+      "check_out_unavailable": "Check in first",
+      "check_out_window_closed": "Check-out is no longer possible",
+      "locked_after_check_in": "Checked in - booking can no longer be cancelled",
+      "example_modal": {
+        "title": "Take a photo",
+        "description_with_example": "Take your photo so the room looks like the example above.",
+        "description_no_example": "Take a clear, well-lit photo of the room using your camera.",
+        "cancel": "Cancel",
+        "continue": "Continue",
+        "shared_with_vestide": "Your check-out photos and how the room was left are shared with Vestide, your landlord."
+      },
+      "error_generic": "Something went wrong, please try again.",
+      "error_too_large": "Your photos are too large to upload. Try fewer photos at once."
+    },
+    "notes": {
+      "from_management": "Note from management: {body}"
+    }
   },
   "public_layout": {
     "brand_name": "",
@@ -99,7 +150,7 @@
   },
   "home": {
     "title": "Home",
-    "subtitle": "I dont know what to put here (:"
+    "subtitle": "Welcome to the Haven Community!\n\nThis website was created by and for the Haven Community. It’s the place to keep each other informed, discover activities, and make use of the amenities within Haven.\n\nCheck the calendar, book a common room, and stay connected with everything happening in the community.\n\nQuestions, ideas, or need help? Contact us at crew{'@'}havencommunity.nl."
   },
   "profile": {
     "title": "Your Profile",
@@ -112,7 +163,16 @@
     },
     "actions_title": "Actions",
     "logout_title": "Logout",
-    "logout_description": "Logout of this current session."
+    "logout_description": "Logout of this current session.",
+    "settings_title": "Settings",
+    "settings": {
+      "language": "Language",
+      "theme": "Theme",
+      "theme_system": "System",
+      "theme_light": "Light",
+      "theme_dark": "Dark",
+      "save_failed": "Could not save your settings. Please try again."
+    }
   },
   "public_wip": {
     "badge": "Coming Soon",

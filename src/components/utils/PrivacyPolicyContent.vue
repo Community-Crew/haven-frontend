@@ -1,9 +1,14 @@
 <script setup lang="ts">
 // Shared rich-content rendering for the privacy policy text, used by both
 // the public informational page and the dashboard accept-gate.
-defineProps<{
+import {computed} from 'vue'
+import {sanitizeHtml} from '@/utils/sanitizeHtml'
+
+const props = defineProps<{
   html: string
 }>()
+
+const safeHtml = computed(() => sanitizeHtml(props.html))
 </script>
 
 <template>
@@ -15,6 +20,6 @@ defineProps<{
              [&_a]:text-haven-blue [&_a]:dark:text-haven-yellow [&_a]:underline
              [&_strong]:font-bold
              [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:mb-3 [&_li]:mb-1"
-      v-html="html"
+      v-html="safeHtml"
   />
 </template>

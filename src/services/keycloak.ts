@@ -90,6 +90,10 @@ export const initKeycloak = async (): Promise<boolean> => {
         };
 
         if (Capacitor.isNativePlatform()) {
+            // Registered before init (not after it succeeds) so a login
+            // started after a failed init can still complete its callback.
+            setupDeepLinkListener();
+
             // Capacitor's Cordova compatibility layer makes keycloak-js
             // auto-detect its 'cordova' adapter, whose redirectUri resolver
             // ignores the per-call redirectUri passed to createLoginUrl and
@@ -101,7 +105,15 @@ export const initKeycloak = async (): Promise<boolean> => {
         if (storedToken && storedRefreshToken) {
             initConfig.token = storedToken;
             initConfig.refreshToken = storedRefreshToken;
-        } else if (!Capacitor.isNativePlatform()) {
+        }
+
+        if (!Capacitor.isNativePlatform()) {
+            // Also set when resuming from stored tokens: without onLoad,
+            // keycloak-js rejects init outright when refreshing a stale
+            // stored token fails (expired offline session, Keycloak briefly
+            // unreachable), which left the app unmounted - a blank page
+            // until the next reload. With it, it falls back to a silent SSO
+            // check instead.
             initConfig.onLoad = 'check-sso';
             initConfig.silentCheckSsoRedirectUri = window.location.origin + '/silent-check-sso.html';
         }
@@ -109,15 +121,13 @@ export const initKeycloak = async (): Promise<boolean> => {
         keycloak.init(initConfig)
             .then((authenticated) => {
                 updateState(authenticated);
-
-                if (Capacitor.isNativePlatform()) {
-                    setupDeepLinkListener();
-                }
-
                 resolve(authenticated);
             })
-            .catch((err) => {
-                clearTokens();
+            .catch(async (err) => {
+                await clearTokens().catch(() => {});
+                authState.isAuthenticated = false;
+                authState.token = null;
+                authState.user = null;
                 reject(err);
             });
     });

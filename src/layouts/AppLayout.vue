@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import LocaleSwitcher from "@/components/utils/LocaleSwitcher.vue";
 import type { User } from "@/types/user.ts";
 import { userService } from "@/services/userService.ts";
 import ThemeSwitcher from "@/components/utils/ThemeSwitcher.vue";
+import BuiltBy from "@/components/utils/BuiltBy.vue";
 import { navigationItems } from "@/config/navigation.ts";
 import packageInfo from '../../package.json' // 🏷️ Import your package JSON to grab the version
 
@@ -34,7 +34,7 @@ const mobileOverflowItems = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col md:flex-row h-screen w-screen bg-haven-white dark:bg-haven-blue select-none overflow-hidden text-haven-black">
+  <div class="flex flex-col md:flex-row h-dvh w-full bg-haven-white dark:bg-haven-blue select-none overflow-hidden text-haven-black">
 
     <aside
         class="hidden md:flex flex-col bg-haven-blue text-white justify-between transition-all duration-300 ease-in-out relative border-r border-white/5 z-20"
@@ -71,10 +71,6 @@ const mobileOverflowItems = computed(() =>
 
         <div v-if="!isCollapsed" class="mt-8 px-6 space-y-6">
           <div>
-            <p class="text-[10px] uppercase font-black tracking-widest text-white/40 mb-2">{{ $t('general.language_label') }}</p>
-            <LocaleSwitcher/>
-          </div>
-          <div>
             <p class="text-[10px] uppercase font-black tracking-widest text-white/40 mb-2">{{ $t('general.theme_label') }}</p>
             <ThemeSwitcher/>
           </div>
@@ -96,8 +92,9 @@ const mobileOverflowItems = computed(() =>
           </div>
         </router-link>
 
-        <div v-if="!isCollapsed" class="px-6 pb-3 text-[9px] font-mono font-bold text-white/30 tracking-wider">
-          {{ appVersion }}
+        <div v-if="!isCollapsed" class="px-6 pb-3 flex flex-col gap-0.5 text-[9px] font-bold text-white/30">
+          <span class="font-mono tracking-wider">{{ appVersion }}</span>
+          <BuiltBy/>
         </div>
       </div>
     </aside>
@@ -143,11 +140,11 @@ const mobileOverflowItems = computed(() =>
         leave-from-class="translate-y-0 opacity-100"
         leave-to-class="translate-y-full opacity-0"
     >
-      <div v-if="isMoreMenuOpen" class="md:hidden fixed inset-0 bg-haven-blue text-white z-40 p-6 flex flex-col justify-between pt-20">
+      <div v-if="isMoreMenuOpen" class="md:hidden fixed inset-x-0 top-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] bg-haven-blue text-white z-40 p-6 flex flex-col justify-between pt-[calc(5rem+env(safe-area-inset-top))]">
 
         <div class="flex flex-col flex-1 overflow-y-auto">
           <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-black text-haven-yellow uppercase tracking-wider">Features & Settings</h2>
+            <h2 class="text-xl font-black text-haven-yellow uppercase tracking-wider">{{ $t('navigation.more_menu_title') }}</h2>
             <button @click="closeMoreMenu" class="h-8 w-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-sm font-bold">✕</button>
           </div>
 
@@ -166,10 +163,6 @@ const mobileOverflowItems = computed(() =>
           </div>
 
           <div class="border-t border-white/10 pt-6 space-y-6">
-            <div>
-              <p class="text-[10px] uppercase font-black tracking-widest text-white/40 mb-2">{{ $t('general.language_label') }}</p>
-              <LocaleSwitcher/>
-            </div>
             <div>
               <p class="text-[10px] uppercase font-black tracking-widest text-white/40 mb-2">{{ $t('general.theme_label') }}</p>
               <ThemeSwitcher/>
@@ -191,22 +184,24 @@ const mobileOverflowItems = computed(() =>
             <span class="text-white/40 text-sm">➔</span>
           </router-link>
 
-          <div class="text-center text-[10px] font-mono font-bold text-white/20 tracking-widest pt-1">
-            {{ appVersion }}
+          <div class="text-center text-[10px] font-bold text-white/30 pt-1">
+            <span class="font-mono tracking-widest">{{ appVersion }}</span>
+            <span class="mx-1.5">·</span>
+            <BuiltBy/>
           </div>
         </div>
 
       </div>
     </Transition>
 
-    <nav class="md:hidden flex justify-around items-center border-t border-haven-blue/10 bg-white pb-[env(safe-area-inset-bottom)] h-16 box-content z-50 relative">
+    <nav class="md:hidden flex justify-around items-center border-t border-haven-blue/10 dark:border-white/10 bg-white dark:bg-haven-blue pb-[env(safe-area-inset-bottom)] h-16 box-content z-50 relative">
       <router-link
           v-for="item in mobilePrimaryItems"
           :key="item.to"
           :to="{ name: item.to }"
           @click="closeMoreMenu"
-          class="flex flex-col items-center text-xs text-slate-500"
-          active-class="text-haven-blue font-bold"
+          class="flex flex-col items-center text-xs text-slate-500 dark:text-white/60"
+          active-class="text-haven-blue! dark:text-haven-yellow! font-bold"
       >
         <span class="text-xl">{{ item.icon }}</span>
         <span>{{ $t(item.labelKey) }}</span>
@@ -214,11 +209,11 @@ const mobileOverflowItems = computed(() =>
 
       <button
           @click="isMoreMenuOpen = !isMoreMenuOpen"
-          class="flex flex-col items-center text-xs text-slate-500 cursor-pointer"
-          :class="isMoreMenuOpen ? 'text-haven-yellow font-black' : ''"
+          class="flex flex-col items-center text-xs text-slate-500 dark:text-white/60 cursor-pointer"
+          :class="isMoreMenuOpen ? 'text-haven-blue! dark:text-haven-yellow! font-bold' : ''"
       >
         <span class="text-xl">✨</span>
-        <span>{{ isMoreMenuOpen ? 'Close' : 'More' }}</span>
+        <span>{{ isMoreMenuOpen ? $t('navigation.close') : $t('navigation.more') }}</span>
       </button>
     </nav>
 
