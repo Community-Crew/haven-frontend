@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import type { User } from "@/types/user.ts";
 import { userService } from "@/services/userService.ts";
+import { healthService } from "@/services/healthService.ts";
 import ThemeSwitcher from "@/components/utils/ThemeSwitcher.vue";
 import BuiltBy from "@/components/utils/BuiltBy.vue";
 import { navigationItems } from "@/config/navigation.ts";
@@ -11,6 +12,8 @@ const isCollapsed = ref(false)
 const isMoreMenuOpen = ref(false)
 const user = ref<User | null>(null)
 const appVersion = ref(`v${packageInfo.version}`) // 🏷️ Format version tag
+// The backend's own release, from /api/health.
+const apiVersion = ref<string | null>(null)
 
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value
@@ -21,6 +24,7 @@ const closeMoreMenu = () => {
 }
 
 onMounted(async () => {
+  healthService.getApiVersion().then(version => apiVersion.value = version)
   user.value = await userService.getCurrentUser();
 })
 
@@ -93,7 +97,7 @@ const mobileOverflowItems = computed(() =>
         </router-link>
 
         <div v-if="!isCollapsed" class="px-6 pb-3 flex flex-col gap-0.5 text-[9px] font-bold text-white/30">
-          <span class="font-mono tracking-wider">{{ appVersion }}</span>
+          <span class="font-mono tracking-wider">{{ appVersion }}<template v-if="apiVersion"> · API {{ apiVersion }}</template></span>
           <BuiltBy/>
         </div>
       </div>
@@ -185,7 +189,7 @@ const mobileOverflowItems = computed(() =>
           </router-link>
 
           <div class="text-center text-[10px] font-bold text-white/30 pt-1">
-            <span class="font-mono tracking-widest">{{ appVersion }}</span>
+            <span class="font-mono tracking-widest">{{ appVersion }}<template v-if="apiVersion"> · API {{ apiVersion }}</template></span>
             <span class="mx-1.5">·</span>
             <BuiltBy/>
           </div>
