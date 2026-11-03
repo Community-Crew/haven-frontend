@@ -3,6 +3,7 @@ import {ref, onMounted} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {roomService} from '@/services/roomService'
 import RoomScheduler from '@/components/rooms/RoomScheduler.vue'
+import RoomPolicy from '@/components/rooms/RoomPolicy.vue'
 import AppLayout from "@/layouts/AppLayout.vue";
 import {useI18n} from "vue-i18n";
 
@@ -103,7 +104,8 @@ const handleBackClick = () => {
           </div>
         </div>
 
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-2 space-y-6">
+          <RoomPolicy :schedule="weeklySchedule" />
           <RoomScheduler
               :room-id="roomSpec.id"
               @booking-success="handleBookingSuccess"

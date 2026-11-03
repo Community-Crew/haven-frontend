@@ -41,6 +41,13 @@
     "error_fallback": "Something went wrong with reserving the room!",
     "past_slot": "Passed"
   },
+  "room_policy": {
+    "title": "When can you book this room?",
+    "advance": "You can book up to {days} day in advance. | You can book up to {days} days in advance.",
+    "all_day": "All day",
+    "closed": "Not bookable",
+    "not_bookable": "You can't book this room."
+  },
   "room_status": {
     "available": "Available",
     "occupied": "Occupied",

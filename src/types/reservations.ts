@@ -30,6 +30,8 @@ export interface ReservationPayload {
     start_at: string;
     end_at: string;
     share_name: boolean;
+    pow_challenge?: string;
+    pow_nonce?: number;
 }
 
 export interface ReservationQueryParams {
