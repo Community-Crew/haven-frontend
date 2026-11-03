@@ -144,7 +144,7 @@ const mobileOverflowItems = computed(() =>
 
         <div class="flex flex-col flex-1 overflow-y-auto">
           <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-black text-haven-yellow uppercase tracking-wider">Features & Settings</h2>
+            <h2 class="text-xl font-black text-haven-yellow uppercase tracking-wider">{{ $t('navigation.more_menu_title') }}</h2>
             <button @click="closeMoreMenu" class="h-8 w-8 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-sm font-bold">✕</button>
           </div>
 
@@ -213,7 +213,7 @@ const mobileOverflowItems = computed(() =>
           :class="isMoreMenuOpen ? 'text-haven-blue! dark:text-haven-yellow! font-bold' : ''"
       >
         <span class="text-xl">✨</span>
-        <span>{{ isMoreMenuOpen ? 'Close' : 'More' }}</span>
+        <span>{{ isMoreMenuOpen ? $t('navigation.close') : $t('navigation.more') }}</span>
       </button>
     </nav>
 

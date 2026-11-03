@@ -3,7 +3,10 @@
     "home": "Home",
     "rooms": "Ruimtes",
     "agenda": "Agenda",
-    "reservations": "Reserveringen"
+    "reservations": "Reserveringen",
+    "more": "Meer",
+    "close": "Sluiten",
+    "more_menu_title": "Functies & Instellingen"
   },
   "general": {
     "loading": "Objecten laden...",
