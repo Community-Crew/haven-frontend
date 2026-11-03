@@ -54,52 +54,49 @@ interface Solved {
     challenge: string
     nonce: number
     usableAt: number
+    expiresAt: number
 }
 
 /**
  * Keeps a solved reservation challenge ready (see App\Services\ProofOfWork
  * on the backend): fetched and solved in a Web Worker as soon as the booking
  * form is on screen, so by the time the resident has picked a slot and
- * typed a name it's long done. A challenge lasts `expires_in` seconds, so a
- * fresh one is fetched and solved shortly before that while the form stays
- * open; each one is used once, so taking it starts the next straight away.
+ * typed a name it's long done.
+ *
+ * A challenge lasts `expires_in` seconds. A minute before that, the next one
+ * is fetched and solved alongside - the current one stays usable until it
+ * really expires, so there's no gap in which a booking has to wait. Each is
+ * used once, so taking one starts on the next straight away.
  */
 export function useProofOfWork() {
-    let solved: Promise<Solved | null> | null = null
+    // The solution to hand out next, and the one being worked on (if any).
+    let ready: Solved | null = null
+    let pending: Promise<Solved | null> | null = null
     let worker: Worker | null = null
-    let rejectSolve: ((reason: Error) => void) | null = null
     let refreshTimer: ReturnType<typeof setTimeout> | null = null
     let stopped = false
 
-    const cancel = () => {
-        worker?.terminate()
-        worker = null
-        // Anyone still waiting on the cancelled solve moves on to the next.
-        rejectSolve?.(new Error('cancelled'))
-        rejectSolve = null
+    // Leave this much of a solution's lifetime for the request to arrive.
+    const MARGIN_MS = 15_000
 
-        if (refreshTimer) {
-            clearTimeout(refreshTimer)
-            refreshTimer = null
-        }
-    }
+    const isUsable = (solved: Solved | null): solved is Solved => solved !== null && solved.expiresAt - MARGIN_MS > Date.now()
 
     const solveInWorker = (challenge: string, difficulty: number) => new Promise<number>((resolve, reject) => {
-        rejectSolve = reject
         worker = new Worker(new URL('../workers/proofOfWork.worker.ts', import.meta.url), {type: 'module'})
         worker.onmessage = (event: MessageEvent<{ nonce: number }>) => resolve(event.data.nonce)
         worker.onerror = reject
         worker.postMessage({challenge, difficulty})
     })
 
+    /**
+     * Start on the next solution, unless one is already being worked on.
+     */
     const prepare = () => {
-        cancel()
-
-        if (stopped) {
+        if (stopped || pending) {
             return
         }
 
-        const current = (async () => {
+        const current = (async (): Promise<Solved | null> => {
             // 404: a backend from before the proof of work - book without it.
             const issued = await reservationService.getChallenge()
                 .catch(err => err?.response?.status === 404 ? null : Promise.reject(err))
@@ -112,11 +109,7 @@ export function useProofOfWork() {
             }
 
             const {challenge, difficulty, min_age, expires_in} = issued
-
             const issuedAt = Date.now()
-            // A minute's margin, so a booking submitted right at the end
-            // doesn't arrive just after the backend stopped accepting it.
-            refreshTimer = setTimeout(prepare, Math.max(expires_in - 60, 30) * 1000)
 
             const started = performance.now()
             const nonce = await solveInWorker(challenge, difficulty)
@@ -124,69 +117,75 @@ export function useProofOfWork() {
             log(`difficulty ${difficulty}: solved after ${nonce + 1} hashes in ${Math.round(took)} ms (~${Math.round((nonce + 1) / (took / 1000))} hashes/s)`)
             worker?.terminate()
             worker = null
-            rejectSolve = null
 
-            return {challenge, nonce, usableAt: issuedAt + min_age * 1000}
+            const solved = {challenge, nonce, usableAt: issuedAt + min_age * 1000, expiresAt: issuedAt + expires_in * 1000}
+
+            // The overlap: start on the successor a minute before this one runs out.
+            if (refreshTimer) {
+                clearTimeout(refreshTimer)
+            }
+            refreshTimer = setTimeout(prepare, Math.max(expires_in - 60, 30) * 1000)
+
+            return solved
         })()
 
-        solved = current
+        pending = current
 
-        // A failed fetch (offline, rate-limited) is retried by take().
-        current.catch(() => {
-            if (solved === current) {
-                solved = null
-            }
-        })
+        current
+            .then(solved => {
+                // Newer than whatever was ready, so it lives longer.
+                if (solved) {
+                    ready = solved
+                }
+            })
+            // A failed fetch (offline, rate-limited) is retried by take().
+            .catch(() => undefined)
+            .finally(() => {
+                if (pending === current) {
+                    pending = null
+                }
+            })
     }
 
     /**
-     * The fields to send along with the reservation. Waits if the solution
-     * isn't ready yet - only possible when someone books within seconds of
-     * opening the page.
+     * The fields to send along with the reservation: the ready solution if
+     * it's still valid, otherwise the one being worked on. Only waits when
+     * someone books within seconds of opening the page.
      */
     const take = async (): Promise<ProofOfWorkFields> => {
-        let result: Solved | null
+        let solved: Solved | null = isUsable(ready) ? ready : null
 
-        for (;;) {
+        if (!solved) {
+            prepare()
+            solved = await pending
+
+            // Off on the backend (or no endpoint yet): book without.
             if (!solved) {
-                prepare()
-            }
-
-            const current = solved
-
-            try {
-                result = await current
-                break
-            } catch (err) {
-                // Replaced by a refresh while waiting: wait for that one instead.
-                if (current !== solved) {
-                    continue
-                }
-
-                throw err
+                return {}
             }
         }
 
-        if (!result) {
-            return {}
-        }
+        // Single use - hand it out and start on the next.
+        ready = null
+        prepare()
 
-        const wait = result.usableAt - Date.now()
+        const wait = solved.usableAt - Date.now()
 
         if (wait > 0) {
             log(`waiting ${wait} ms for the minimum age before submitting`)
             await new Promise(resolve => setTimeout(resolve, wait))
         }
 
-        // Single use - start on the next one for a following booking.
-        prepare()
-
-        return {pow_challenge: result.challenge, pow_nonce: result.nonce}
+        return {pow_challenge: solved.challenge, pow_nonce: solved.nonce}
     }
 
     onBeforeUnmount(() => {
         stopped = true
-        cancel()
+        worker?.terminate()
+
+        if (refreshTimer) {
+            clearTimeout(refreshTimer)
+        }
     })
 
     return {prepare, take}
