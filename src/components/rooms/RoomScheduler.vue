@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { reservationService } from '@/services/reservationService'
+import { isProofOfWorkError, useProofOfWork } from '@/composables/useProofOfWork'
 import { roomService } from "@/services/roomService.ts"
 import type { Reservation } from '@/types/reservations'
 import {
@@ -39,9 +40,19 @@ const getAmsterdamCurrentTime = (): string => {
 const reservations = ref<Reservation[]>([])
 const weeklyScheduleCache = ref<any[]>([])
 const activePolicies = ref<{ start: string; end: string; max_days: number }[]>([])
+// "Today" for the max_days_in_advance countdown, as computed by the backend
+// (ReservationPolicyService::effectiveToday()). Once the reservation window
+// opens early (RESERVATION_WINDOW_OPEN_TIME, e.g. 20:00 the evening before),
+// this rolls forward to tomorrow's date - falls back to the real calendar
+// date if the API hasn't returned it yet.
+const effectiveTodayStr = ref<string | null>(null)
 const selectedSlots = ref<string[]>([])
 const reservationName = ref('')
 const shareName = ref<boolean>(true)
+
+// Solved in the background while the resident picks a slot - see useProofOfWork.
+const proofOfWork = useProofOfWork()
+onMounted(() => proofOfWork.prepare())
 
 const isLoading = ref(false)
 const isSubmitting = ref(false)
@@ -101,7 +112,7 @@ const condensedTimeline = computed(() => {
 
       let isPastMaxDays = false
       if (policyEntry && policyEntry.max_days) {
-        const today = new Date(todayStr)
+        const today = new Date(effectiveTodayStr.value || todayStr)
         const selected = new Date(selectedDate.value)
         const diffTime = selected.getTime() - today.getTime()
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
@@ -218,6 +229,7 @@ const fetchInitialData = async () => {
 
     const policyResponse = await roomService.getWeeklySchedule(props.roomId)
     weeklyScheduleCache.value = policyResponse.data || []
+    effectiveTodayStr.value = policyResponse.effective_today || null
 
     syncActivePolicies()
     await fetchDateReservations()
@@ -324,13 +336,22 @@ const handleBookingSubmit = async () => {
     isError.value = false
     feedbackMessage.value = null
 
-    await reservationService.createReservation({
+    const payload = {
       room_id: props.roomId,
       name: reservationName.value.trim(),
       start_at: computedTimeBounds.value.start_at,
       end_at: computedTimeBounds.value.end_at,
       share_name: shareName.value
-    })
+    }
+
+    try {
+      await reservationService.createReservation({ ...payload, ...await proofOfWork.take() })
+    } catch (err: any) {
+      // Expired or already used (e.g. the page was left open for a long
+      // time): once more with a fresh solution before giving up.
+      if (!isProofOfWorkError(err)) throw err
+      await reservationService.createReservation({ ...payload, ...await proofOfWork.take() })
+    }
 
     feedbackMessage.value = t('reservations.success_message')
     selectedSlots.value = []
@@ -349,18 +370,18 @@ const handleBookingSubmit = async () => {
 </script>
 
 <template>
-  <div class="bg-white border-2 border-haven-blue rounded-2xl p-6 shadow-[4px_4px_0px_0px_#091d4b] max-w-xl mx-auto">
+  <div class="bg-white border-2 border-haven-blue rounded-2xl p-6 shadow-[4px_4px_0px_0px_#091d4b] dark:bg-slate-800 dark:border-white/10 dark:shadow-none max-w-xl mx-auto">
     <div
-        class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b-2 border-slate-100 pb-4 mb-4 gap-2">
+        class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b-2 border-slate-100 dark:border-white/5 pb-4 mb-4 gap-2">
       <div>
-        <h3 class="text-base font-black text-haven-blue uppercase tracking-wider">{{ $t('room_scheduler.title') }}</h3>
-        <p class="text-xs text-slate-500 font-medium">{{ $t('room_scheduler.subtitle') }}</p>
+        <h3 class="text-base font-black text-haven-blue dark:text-slate-100 uppercase tracking-wider">{{ $t('room_scheduler.title') }}</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ $t('room_scheduler.subtitle') }}</p>
       </div>
       <input
           v-model="selectedDate"
           type="date"
           :min="minDate"
-          class="border-2 border-haven-blue rounded-xl px-3 py-1.5 text-xs font-black focus:outline-none bg-slate-50"
+          class="border-2 border-haven-blue rounded-xl px-3 py-1.5 text-xs font-black focus:outline-none bg-slate-50 dark:bg-white/10 dark:border-white/10 dark:text-white"
       />
     </div>
 
@@ -372,7 +393,7 @@ const handleBookingSubmit = async () => {
       <template v-for="slot in condensedTimeline" :key="slot.time">
 
         <div v-if="slot.status === 'occupied'"
-             class="bg-haven-blue text-white p-4 rounded-xl border-2 border-haven-blue">
+             class="bg-haven-blue text-white p-4 rounded-xl border-2 border-haven-blue dark:bg-black/30 dark:border-white/10">
           <div class="flex justify-between text-[10px] font-black text-white/70">
             <span>⏰ {{ slot.booking.time_range }}</span>
             <span class="text-pink-300 uppercase">🔒 {{ $t('room_scheduler.occupied') }}</span>
@@ -385,20 +406,20 @@ const handleBookingSubmit = async () => {
 
         <div
             v-else-if="slot.status === 'past_slot_condensed'"
-            class="bg-slate-50 border-2 border-slate-100 text-slate-400 p-3 rounded-xl flex items-center justify-between opacity-50 select-none"
+            class="bg-slate-50 border-2 border-slate-100 text-slate-400 dark:bg-white/5 dark:border-white/5 dark:text-slate-500 p-3 rounded-xl flex items-center justify-between opacity-50 select-none"
         >
           <span class="text-xs font-bold tracking-wide">⌛ {{ $t('room_scheduler.past_slot') }}</span>
-          <span class="text-[10px] font-mono font-black bg-slate-200/40 px-2 py-1 rounded-md text-slate-400">
+          <span class="text-[10px] font-mono font-black bg-slate-200/40 dark:bg-white/10 px-2 py-1 rounded-md text-slate-400">
             {{ slot.time_range }}
           </span>
         </div>
 
         <div
             v-else-if="slot.status === 'locked_condensed'"
-            class="bg-slate-50 border-2 border-slate-200 text-slate-400 p-3 rounded-xl flex items-center justify-between opacity-70"
+            class="bg-slate-50 border-2 border-slate-200 text-slate-400 dark:bg-white/5 dark:border-white/10 dark:text-slate-500 p-3 rounded-xl flex items-center justify-between opacity-70"
         >
           <span class="text-xs font-bold tracking-wide">🔒 {{ $t('room_scheduler.policy_restricted') }}</span>
-          <span class="text-[10px] font-mono font-black bg-slate-200/60 px-2 py-1 rounded-md text-slate-500">
+          <span class="text-[10px] font-mono font-black bg-slate-200/60 dark:bg-white/10 px-2 py-1 rounded-md text-slate-500 dark:text-slate-400">
             {{ slot.time_range }}
           </span>
         </div>
@@ -411,13 +432,13 @@ const handleBookingSubmit = async () => {
             class="flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer select-none"
             :class="[
             selectedSlots.includes(slot.time)
-              ? 'bg-haven-blue/10 border-haven-blue text-haven-blue font-black scale-[0.99]'
-              : 'bg-white border-slate-200 text-slate-700 font-bold hover:border-haven-blue'
+              ? 'bg-haven-blue/10 border-haven-blue text-haven-blue font-black scale-[0.99] dark:bg-haven-yellow/15 dark:border-haven-yellow dark:text-haven-yellow'
+              : 'bg-white border-slate-200 text-slate-700 font-bold hover:border-haven-blue dark:bg-white/5 dark:border-white/10 dark:text-slate-200 dark:hover:border-haven-yellow'
           ]"
         >
           <span class="text-xs font-mono tracking-wide">{{ slot.time }}</span>
           <span
-              class="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md text-haven-blue bg-haven-blue/5">
+              class="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md text-haven-blue bg-haven-blue/5 dark:text-current dark:bg-white/10">
             {{ selectedSlots.includes(slot.time) ? $t('room_scheduler.selected') : $t('room_scheduler.available') }}
           </span>
         </div>
@@ -425,28 +446,28 @@ const handleBookingSubmit = async () => {
       </template>
     </div>
 
-    <div v-if="computedTimeBounds && !isLoading" class="mt-6 pt-4 border-t-2 border-slate-100 space-y-4">
+    <div v-if="computedTimeBounds && !isLoading" class="mt-6 pt-4 border-t-2 border-slate-100 dark:border-white/5 space-y-4">
       <div>
-        <label class="block text-xs font-black uppercase text-haven-blue/70 mb-1">{{
+        <label class="block text-xs font-black uppercase text-haven-blue/70 dark:text-slate-400 mb-1">{{
             $t('room_scheduler.name_label')
           }}</label>
         <input
             v-model="reservationName"
             type="text"
             :placeholder="$t('room_scheduler.placeholder_name')"
-            class="w-full border-2 border-haven-blue rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:bg-slate-50"
+            class="w-full border-2 border-haven-blue rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:bg-slate-50 dark:bg-white/10 dark:border-white/10 dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-white/15 dark:focus:border-haven-yellow"
         />
       </div>
 
       <div
-          class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 flex justify-between items-center">
+          class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 dark:bg-white/5 dark:border-white/10 dark:text-slate-300 flex justify-between items-center">
         <span>{{ $t('room_scheduler.selected_block_label') }}</span>
-        <span class="text-haven-blue font-black bg-white px-2 py-1 border rounded-lg shadow-sm">
+        <span class="text-haven-blue font-black bg-white px-2 py-1 border rounded-lg shadow-sm dark:bg-haven-yellow dark:border-haven-yellow">
           ⏰ {{ computedTimeBounds.displayStart }} - {{ computedTimeBounds.displayEnd }}
         </span>
       </div>
 
-      <div class="mt-4 bg-slate-50 border border-slate-200 rounded-xl p-3">
+      <div class="mt-4 bg-slate-50 border border-slate-200 rounded-xl p-3 dark:bg-white/5 dark:border-white/10">
         <div class="flex items-start gap-3">
           <div class="flex items-center h-5">
             <input
@@ -457,10 +478,10 @@ const handleBookingSubmit = async () => {
             />
           </div>
           <div class="text-xs">
-            <label for="share_name" class="font-bold text-haven-blue cursor-pointer select-none">
+            <label for="share_name" class="font-bold text-haven-blue dark:text-slate-100 cursor-pointer select-none">
               {{ $t('room_scheduler.share_name_label') }}
             </label>
-            <p class="text-slate-500 font-medium mt-0.5">
+            <p class="text-slate-500 dark:text-slate-400 font-medium mt-0.5">
               {{ $t('room_scheduler.share_name_description') }}
             </p>
           </div>
@@ -470,7 +491,7 @@ const handleBookingSubmit = async () => {
       <button
           @click="handleBookingSubmit"
           :disabled="isSubmitting || !reservationName.trim()"
-          class="w-full py-3 bg-haven-blue text-white text-xs font-black uppercase tracking-widest rounded-xl border-2 border-haven-blue shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+          class="w-full py-3 bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue dark:border-haven-yellow dark:shadow-none text-xs font-black uppercase tracking-widest rounded-xl border-2 border-haven-blue shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
       >
         {{ isSubmitting ? $t('room_scheduler.btn_submitting') : $t('room_scheduler.btn_confirm') }}
       </button>

@@ -3,16 +3,20 @@
     "home": "Home",
     "rooms": "Ruimtes",
     "agenda": "Agenda",
-    "reservations": "Reserveringen"
+    "reservations": "Reserveringen",
+    "more": "Meer",
+    "close": "Sluiten",
+    "more_menu_title": "Functies & Instellingen"
   },
   "general": {
     "loading": "Objecten laden...",
     "back": "⬅️ Terug",
     "return": "Ga terug naar het overzicht.",
     "language_label": "Language / Taal",
-    "not_applicable": "n.v.t",
+    "not_applicable": "n.v.t. ",
     "darkmode_beta": "Darkmode is in Beta",
     "theme_label": "Thema",
+    "built_by": "Gemaakt met {heart} in Eindhoven door {name}",
     "logout": "Uitloggen"
   },
   "rooms": {
@@ -40,6 +44,13 @@
     "error_fallback": "Er is iets misgegaan bij het reserveren van de ruimte!",
     "past_slot": "Verstreken"
   },
+  "room_policy": {
+    "title": "Wanneer kun je deze ruimte reserveren?",
+    "advance": "Je kunt tot {days} dag vooruit reserveren. | Je kunt tot {days} dagen vooruit reserveren.",
+    "all_day": "Hele dag",
+    "closed": "Niet te reserveren",
+    "not_bookable": "Je kunt deze ruimte niet reserveren."
+  },
   "room_status": {
     "available": "Beschikbaar",
     "occupied": "Bezet",
@@ -60,6 +71,11 @@
       "room_label": "Ruimte: ",
       "all_rooms": "Alle Ruimtes"
     },
+    "pagination": {
+      "previous": "Vorige",
+      "next": "Volgende",
+      "page_of": "Pagina {current} van {total}"
+    },
     "no_records": "Geen reserveringen gevonden",
     "actions": {
       "save": "Opslaan",
@@ -76,7 +92,42 @@
       "cancelled": "Geannuleerd"
     },
     "private_allocation": "Privéreservering",
-    "success_message": "Reservering is succesvol gemaakt."
+    "success_message": "Reservering is succesvol gemaakt.",
+    "checks": {
+      "check_in_label": "Inchecken",
+      "check_out_label": "Uitchecken",
+      "actions": {
+        "check_in": "Inchecken",
+        "check_out": "Uitchecken",
+        "add_photo": "Nog een foto toevoegen",
+        "submit": "Versturen",
+        "uploading": "Bezig met uploaden..."
+      },
+      "statuses": {
+        "pending": "In beoordeling",
+        "verified": "Geverifieerd",
+        "rejected": "Afgewezen"
+      },
+      "rejection_note_prefix": "Reden: ",
+      "check_in_not_yet_open": "Inchecken kan vanaf 15 minuten voor aanvang van de reservering",
+      "check_in_unavailable": "Deze reservering is afgelopen - inchecken is niet meer mogelijk",
+      "check_out_unavailable": "Check eerst in",
+      "check_out_window_closed": "Uitchecken is niet meer mogelijk",
+      "locked_after_check_in": "Ingecheckt - reservering kan niet meer geannuleerd worden",
+      "example_modal": {
+        "title": "Maak een foto",
+        "description_with_example": "Maak je foto zodat de ruimte eruitziet zoals het voorbeeld hierboven.",
+        "description_no_example": "Maak met je camera een duidelijke, goed belichte foto van de ruimte.",
+        "cancel": "Annuleren",
+        "continue": "Doorgaan",
+        "shared_with_vestide": "Je uitcheckfoto's en hoe de ruimte is achtergelaten worden gedeeld met Vestide, je verhuurder."
+      },
+      "error_generic": "Er is iets misgegaan, probeer het opnieuw.",
+      "error_too_large": "Je foto's zijn te groot om te uploaden. Probeer minder foto's tegelijk."
+    },
+    "notes": {
+      "from_management": "Bericht van het beheer: {body}"
+    }
   },
   "public_layout": {
     "brand_name": "",
@@ -112,7 +163,16 @@
     },
     "actions_title": "Acties",
     "logout_title": "Uitloggen",
-    "logout_description": "Log de huidige sessie uit."
+    "logout_description": "Log de huidige sessie uit.",
+    "settings_title": "Instellingen",
+    "settings": {
+      "language": "Taal",
+      "theme": "Thema",
+      "theme_system": "Systeem",
+      "theme_light": "Licht",
+      "theme_dark": "Donker",
+      "save_failed": "Je instellingen konden niet worden opgeslagen. Probeer het opnieuw."
+    }
   },
   "public_wip": {
     "badge": "Binnenkort Beschikbaar",

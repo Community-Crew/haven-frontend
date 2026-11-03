@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { applyLocale } from '@/utils/preferences.ts'
+import { useProfileStore } from '@/stores/profile.ts'
+import type { Locale } from '@/types/userSettings.ts'
 
 const { locale } = useI18n()
+const profileStore = useProfileStore()
 
-const changeLanguage = (lang: 'en' | 'nl') => {
-  locale.value = lang
-  localStorage.setItem('user-locale', lang)
+const changeLanguage = (lang: Locale) => {
+  if (profileStore.profile) {
+    profileStore.updateSettings({ locale: lang }).catch((error) => console.error('Could not save language:', error))
+  } else {
+    applyLocale(lang)
+  }
 }
 </script>
 
