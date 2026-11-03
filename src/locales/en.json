@@ -109,7 +109,8 @@
         "description_with_example": "Take your photo so the room looks like the example above.",
         "description_no_example": "Take a clear, well-lit photo of the room using your camera.",
         "cancel": "Cancel",
-        "continue": "Continue"
+        "continue": "Continue",
+        "shared_with_vestide": "Your check-out photos and how the room was left are shared with Vestide, your landlord."
       },
       "error_generic": "Something went wrong, please try again.",
       "error_too_large": "Your photos are too large to upload. Try fewer photos at once."

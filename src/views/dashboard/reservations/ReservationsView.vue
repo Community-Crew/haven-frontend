@@ -755,6 +755,9 @@ watch([activeTimeline, activeStatus, selectedRoomSlug], () => {
                   : $t('reservations.checks.example_modal.description_no_example')
             }}
           </p>
+          <p v-if="checkPreview.type === 'check_out'" class="text-xs text-slate-400 dark:text-slate-500">
+            {{ $t('reservations.checks.example_modal.shared_with_vestide') }}
+          </p>
 
           <div class="flex gap-2 justify-end">
             <button
