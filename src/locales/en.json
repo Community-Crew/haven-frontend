@@ -6,7 +6,8 @@
     "reservations": "Reservations",
     "more": "More",
     "close": "Close",
-    "more_menu_title": "Features & Settings"
+    "more_menu_title": "Features & Settings",
+    "faq": "FAQ"
   },
   "general": {
     "loading": "Fetching objects...",
@@ -227,5 +228,14 @@
     "action": "I agree",
     "action_loading": "Working on it...",
     "error": "Couldn't record your acceptance, please try again."
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "subtitle": "How Haven works, from booking a room to checking out.",
+    "search_placeholder": "Search the FAQ…",
+    "all": "All",
+    "no_results": "No questions match your search.",
+    "load_failed": "The FAQ couldn't be loaded. Please try again later.",
+    "empty": "There are no questions yet."
   }
 }

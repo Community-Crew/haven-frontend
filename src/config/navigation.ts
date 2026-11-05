@@ -13,4 +13,5 @@ export const navigationItems: NavItem[] = [
     { to: 'rooms.index', icon: '🚪', labelKey: t('navigation.rooms'), mobilePriority: true },
     { to: 'reservations.index', icon: '🎟️', labelKey: t('navigation.reservations'), child: true },
     { to: 'agenda.index', icon: '📅', labelKey: t('navigation.agenda'), mobilePriority: true },
+    { to: 'faq.index', icon: '❓', labelKey: t('navigation.faq') },
 ];
