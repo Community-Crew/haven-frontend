@@ -1,5 +1,6 @@
 import {privateApi} from "@/services/api.ts";
 import type {
+    MissedPhotosReservation,
     PaginatedReservations,
     Reservation,
     ReservationCheck,
@@ -39,6 +40,22 @@ export const reservationService = {
     getMyReservations: async (params?: ReservationQueryParams): Promise<PaginatedReservations> => {
         const response = await privateApi.get('/reservations/me', {params: params});
         return response.data;
+    },
+
+    /**
+     * Finished reservations without check-in/check-out photos that haven't
+     * been acknowledged yet - see MissedPhotosModal.vue
+     */
+    getMissedPhotos: async (): Promise<MissedPhotosReservation[]> => {
+        const response = await privateApi.get('/reservations/me/missed-photos');
+        return response.data.data;
+    },
+
+    /**
+     * Dismiss the missed-photos popup for the reservations it showed
+     */
+    acknowledgeMissedPhotos: async (reservationIds: number[]): Promise<void> => {
+        await privateApi.post('/reservations/me/missed-photos/acknowledge', {reservation_ids: reservationIds});
     },
 
     /**

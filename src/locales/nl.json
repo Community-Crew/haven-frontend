@@ -6,7 +6,8 @@
     "reservations": "Reserveringen",
     "more": "Meer",
     "close": "Sluiten",
-    "more_menu_title": "Functies & Instellingen"
+    "more_menu_title": "Functies & Instellingen",
+    "faq": "Veelgestelde vragen"
   },
   "general": {
     "loading": "Objecten laden...",
@@ -123,7 +124,15 @@
         "shared_with_vestide": "Je uitcheckfoto's en hoe de ruimte is achtergelaten worden gedeeld met Vestide, je verhuurder."
       },
       "error_generic": "Er is iets misgegaan, probeer het opnieuw.",
-      "error_too_large": "Je foto's zijn te groot om te uploaden. Probeer minder foto's tegelijk."
+      "error_too_large": "Je foto's zijn te groot om te uploaden. Probeer minder foto's tegelijk.",
+      "missed_modal": {
+        "title": "Je hebt geen foto's geüpload",
+        "description": "Voor deze reserveringen zijn geen foto's geüpload. Vergeet de volgende keer niet om foto's te maken bij het in- en uitchecken.",
+        "missing_check_in": "Geen incheckfoto's",
+        "missing_check_out": "Geen uitcheckfoto's",
+        "missing_both": "Geen in- en uitcheckfoto's",
+        "dismiss": "Begrepen"
+      }
     },
     "notes": {
       "from_management": "Bericht van het beheer: {body}"
@@ -219,5 +228,14 @@
     "action": "Ik ga akkoord",
     "action_loading": "Bezig...",
     "error": "Accepteren is niet gelukt, probeer het opnieuw."
+  },
+  "faq": {
+    "title": "Veelgestelde vragen",
+    "subtitle": "Hoe Haven werkt, van een ruimte reserveren tot uitchecken.",
+    "search_placeholder": "Zoek in de veelgestelde vragen…",
+    "all": "Alles",
+    "no_results": "Geen vragen gevonden.",
+    "load_failed": "De veelgestelde vragen konden niet geladen worden. Probeer het later opnieuw.",
+    "empty": "Er zijn nog geen vragen."
   }
 }

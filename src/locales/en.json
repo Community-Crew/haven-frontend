@@ -6,7 +6,8 @@
     "reservations": "Reservations",
     "more": "More",
     "close": "Close",
-    "more_menu_title": "Features & Settings"
+    "more_menu_title": "Features & Settings",
+    "faq": "FAQ"
   },
   "general": {
     "loading": "Fetching objects...",
@@ -123,7 +124,15 @@
         "shared_with_vestide": "Your check-out photos and how the room was left are shared with Vestide, your landlord."
       },
       "error_generic": "Something went wrong, please try again.",
-      "error_too_large": "Your photos are too large to upload. Try fewer photos at once."
+      "error_too_large": "Your photos are too large to upload. Try fewer photos at once.",
+      "missed_modal": {
+        "title": "You didn't upload photos",
+        "description": "For these reservations no photos were uploaded. Please remember to take photos when you check in and check out next time.",
+        "missing_check_in": "No check-in photos",
+        "missing_check_out": "No check-out photos",
+        "missing_both": "No check-in or check-out photos",
+        "dismiss": "Got it"
+      }
     },
     "notes": {
       "from_management": "Note from management: {body}"
@@ -219,5 +228,14 @@
     "action": "I agree",
     "action_loading": "Working on it...",
     "error": "Couldn't record your acceptance, please try again."
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "subtitle": "How Haven works, from booking a room to checking out.",
+    "search_placeholder": "Search the FAQ…",
+    "all": "All",
+    "no_results": "No questions match your search.",
+    "load_failed": "The FAQ couldn't be loaded. Please try again later.",
+    "empty": "There are no questions yet."
   }
 }
