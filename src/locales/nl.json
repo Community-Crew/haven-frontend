@@ -123,7 +123,15 @@
         "shared_with_vestide": "Je uitcheckfoto's en hoe de ruimte is achtergelaten worden gedeeld met Vestide, je verhuurder."
       },
       "error_generic": "Er is iets misgegaan, probeer het opnieuw.",
-      "error_too_large": "Je foto's zijn te groot om te uploaden. Probeer minder foto's tegelijk."
+      "error_too_large": "Je foto's zijn te groot om te uploaden. Probeer minder foto's tegelijk.",
+      "missed_modal": {
+        "title": "Je hebt geen foto's geüpload",
+        "description": "Voor deze reserveringen zijn geen foto's geüpload. Vergeet de volgende keer niet om foto's te maken bij het in- en uitchecken.",
+        "missing_check_in": "Geen incheckfoto's",
+        "missing_check_out": "Geen uitcheckfoto's",
+        "missing_both": "Geen in- en uitcheckfoto's",
+        "dismiss": "Begrepen"
+      }
     },
     "notes": {
       "from_management": "Bericht van het beheer: {body}"
