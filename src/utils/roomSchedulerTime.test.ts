@@ -26,9 +26,11 @@ describe('timeToMinutes', () => {
 })
 
 describe('parseTimeFromIso', () => {
-  it('extracts the local HH:mm from a datetime string', () => {
-    expect(parseTimeFromIso('2026-08-25 09:15:00')).toBe('09:15')
-    expect(parseTimeFromIso('2026-08-25 00:00:00')).toBe('00:00')
+  it('reads UTC timestamps in Amsterdam time, whatever the device timezone', () => {
+    expect(parseTimeFromIso('2026-08-25T07:15:00.000000Z')).toBe('09:15') // summer, +2
+    expect(parseTimeFromIso('2026-11-11T19:00:00.000000Z')).toBe('20:00') // winter, +1
+    expect(parseTimeFromIso('2026-11-11T23:00:00.000000Z')).toBe('00:00')
+    expect(parseTimeFromIso('2026-11-12T07:00:00.000000Z')).toBe('08:00')
   })
 })
 

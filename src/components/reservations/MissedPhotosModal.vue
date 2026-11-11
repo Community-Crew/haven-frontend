@@ -31,6 +31,7 @@ const missingLabelKey = (missing: MissedPhotosReservation['missing']) => {
 
 const formatDate = (value: string) => new Date(value).toLocaleString([], {
   day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
+  timeZone: 'Europe/Amsterdam',
 })
 
 const dismiss = async () => {

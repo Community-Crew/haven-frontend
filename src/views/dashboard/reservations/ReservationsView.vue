@@ -436,15 +436,16 @@ watch([activeTimeline, activeStatus, selectedRoomSlug], () => {
 
               <div class="flex flex-col space-y-2 text-sm text-slate-500 dark:text-slate-400 font-semibold pt-2">
                 <span class="flex items-center gap-2.5">
-                  <span class="text-base">📅</span> {{ new Date(res.start_at).toLocaleDateString() }}
+                  <span class="text-base">📅</span> {{ new Date(res.start_at).toLocaleDateString([], {timeZone: 'Europe/Amsterdam'}) }}
                 </span>
                 <span class="flex items-center gap-2.5">
                   <span class="text-base">⏰</span> {{
                     new Date(res.start_at).toLocaleTimeString([], {
                       hour: '2-digit',
-                      minute: '2-digit'
+                      minute: '2-digit',
+                      timeZone: 'Europe/Amsterdam'
                     })
-                  }} - {{ new Date(res.end_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) }}
+                  }} - {{ new Date(res.end_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Amsterdam'}) }}
                 </span>
               </div>
             </div>
