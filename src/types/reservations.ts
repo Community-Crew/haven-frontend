@@ -24,6 +24,15 @@ export interface Reservation {
     notes?: ReservationNote[];
 }
 
+export interface MissedPhotosReservation {
+    id: number;
+    name: string;
+    room_name: string | null;
+    start_at: string;
+    end_at: string;
+    missing: Array<'check_in' | 'check_out'>;
+}
+
 export interface ReservationPayload {
     room_id: number;
     name: string;

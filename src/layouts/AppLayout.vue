@@ -5,6 +5,7 @@ import { userService } from "@/services/userService.ts";
 import { healthService } from "@/services/healthService.ts";
 import ThemeSwitcher from "@/components/utils/ThemeSwitcher.vue";
 import BuiltBy from "@/components/utils/BuiltBy.vue";
+import MissedPhotosModal from "@/components/reservations/MissedPhotosModal.vue";
 import { navigationItems } from "@/config/navigation.ts";
 import packageInfo from '../../package.json' // 🏷️ Import your package JSON to grab the version
 
@@ -221,5 +222,6 @@ const mobileOverflowItems = computed(() =>
       </button>
     </nav>
 
+    <MissedPhotosModal/>
   </div>
 </template>
