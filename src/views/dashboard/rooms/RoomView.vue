@@ -4,6 +4,9 @@ import {useRoute, useRouter} from 'vue-router'
 import {roomService} from '@/services/roomService'
 import RoomScheduler from '@/components/rooms/RoomScheduler.vue'
 import RoomPolicy from '@/components/rooms/RoomPolicy.vue'
+import RoomRulesPanel from '@/components/rooms/RoomRulesPanel.vue'
+import RoomRulesPopup from '@/components/rooms/RoomRulesPopup.vue'
+import type {RoomRules} from '@/types/room'
 import AppLayout from "@/layouts/AppLayout.vue";
 import {useI18n} from "vue-i18n";
 
@@ -13,6 +16,7 @@ const router = useRouter()
 
 const roomSpec = ref<any>(null)
 const weeklySchedule = ref<any>(null)
+const roomRules = ref<RoomRules | null>(null)
 
 const isLoading = ref(true)
 const fetchError = ref<string | null>(null)
@@ -77,7 +81,8 @@ const handleBackClick = () => {
 
       <div v-else-if="roomSpec" class="grid lg:grid-cols-3 gap-8 items-start">
 
-        <div class="lg:col-span-1 bg-white space-y-4 border-2 border-haven-blue rounded-2xl p-6 shadow-[4px_4px_0px_0px_#091d4b] dark:bg-slate-800 dark:border-white/10 dark:shadow-none">
+        <div class="lg:col-span-1 space-y-6">
+        <div class="bg-white space-y-4 border-2 border-haven-blue rounded-2xl p-6 shadow-[4px_4px_0px_0px_#091d4b] dark:bg-slate-800 dark:border-white/10 dark:shadow-none">
           <div>
           <span class="text-[10px] font-black uppercase bg-haven-blue/10 text-haven-blue dark:bg-white/10 dark:text-slate-300 px-2 py-1 rounded-md">
             {{ $t('rooms.label')}}
@@ -104,11 +109,25 @@ const handleBackClick = () => {
           </div>
         </div>
 
+        <!-- On phones the rules open in a popup instead. -->
+        <RoomRulesPanel
+            v-if="roomRules?.rules_hash"
+            :rules="roomRules"
+            class="hidden lg:block"
+        />
+        </div>
+
         <div class="lg:col-span-2 space-y-6">
+          <RoomRulesPopup
+              v-if="roomRules?.rules_hash"
+              :rules="roomRules"
+              class="lg:hidden max-w-xl mx-auto"
+          />
           <RoomPolicy :schedule="weeklySchedule" />
           <RoomScheduler
               :room-id="roomSpec.id"
               @booking-success="handleBookingSuccess"
+              @rules-loaded="roomRules = $event"
           />
         </div>
 

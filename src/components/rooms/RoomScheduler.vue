@@ -3,8 +3,11 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { reservationService } from '@/services/reservationService'
 import { isProofOfWorkError, useProofOfWork } from '@/composables/useProofOfWork'
-import { roomService } from "@/services/roomService.ts"
+import { isRoomRulesError, roomService } from "@/services/roomService.ts"
+import RoomRulesCheckbox from '@/components/rooms/RoomRulesCheckbox.vue'
+import RoomRulesPopup from '@/components/rooms/RoomRulesPopup.vue'
 import type { Reservation } from '@/types/reservations'
+import type { RoomRules } from '@/types/room'
 import {
   buildDateTimeString,
   findOverlappingReservation,
@@ -18,7 +21,10 @@ const props = defineProps<{
   roomId: number
 }>()
 
-const emit = defineEmits(['booking-success'])
+const emit = defineEmits<{
+  'booking-success': []
+  'rules-loaded': [rules: RoomRules]
+}>()
 const { t } = useI18n()
 
 const START_HOUR = 8
@@ -49,6 +55,22 @@ const effectiveTodayStr = ref<string | null>(null)
 const selectedSlots = ref<string[]>([])
 const reservationName = ref('')
 const shareName = ref<boolean>(true)
+
+const roomRules = ref<RoomRules | null>(null)
+const rulesAccepted = ref(false)
+const needsRulesAcceptance = computed(() => !!roomRules.value?.rules_hash && !rulesAccepted.value)
+
+// A failed load isn't fatal: the API refuses the booking if the room does
+// have rules, and handleBookingSubmit then loads them again.
+const loadRoomRules = async () => {
+  rulesAccepted.value = false
+  try {
+    roomRules.value = await roomService.getRules(props.roomId)
+    emit('rules-loaded', roomRules.value)
+  } catch (err) {
+    console.error("Failed loading room rules:", err)
+  }
+}
 
 // Solved in the background while the resident picks a slot - see useProofOfWork.
 const proofOfWork = useProofOfWork()
@@ -232,7 +254,7 @@ const fetchInitialData = async () => {
     effectiveTodayStr.value = policyResponse.effective_today || null
 
     syncActivePolicies()
-    await fetchDateReservations()
+    await Promise.all([fetchDateReservations(), loadRoomRules()])
   } catch (err) {
     console.error("Failed loading initial scheduler data structures:", err)
   } finally {
@@ -329,7 +351,7 @@ const computedTimeBounds = computed(() => {
 })
 
 const handleBookingSubmit = async () => {
-  if (!computedTimeBounds.value || !reservationName.value.trim()) return
+  if (!computedTimeBounds.value || !reservationName.value.trim() || needsRulesAcceptance.value) return
 
   try {
     isSubmitting.value = true
@@ -341,7 +363,8 @@ const handleBookingSubmit = async () => {
       name: reservationName.value.trim(),
       start_at: computedTimeBounds.value.start_at,
       end_at: computedTimeBounds.value.end_at,
-      share_name: shareName.value
+      share_name: shareName.value,
+      rules_accepted_hash: roomRules.value?.rules_hash ?? undefined
     }
 
     try {
@@ -356,13 +379,19 @@ const handleBookingSubmit = async () => {
     feedbackMessage.value = t('reservations.success_message')
     selectedSlots.value = []
     reservationName.value = ''
+    rulesAccepted.value = false
 
     await fetchDateReservations()
     emit('booking-success')
 
   } catch (err: any) {
     isError.value = true
-    feedbackMessage.value = err.response?.data?.message || t('room_scheduler.error_fallback')
+    if (isRoomRulesError(err)) {
+      await loadRoomRules()
+      feedbackMessage.value = t('room_rules.changed')
+    } else {
+      feedbackMessage.value = err.response?.data?.message || t('room_scheduler.error_fallback')
+    }
   } finally {
     isSubmitting.value = false
   }
@@ -488,9 +517,14 @@ const handleBookingSubmit = async () => {
         </div>
       </div>
 
+      <template v-if="roomRules?.rules_hash">
+        <RoomRulesPopup :rules="roomRules" class="lg:hidden"/>
+        <RoomRulesCheckbox v-model="rulesAccepted"/>
+      </template>
+
       <button
           @click="handleBookingSubmit"
-          :disabled="isSubmitting || !reservationName.trim()"
+          :disabled="isSubmitting || !reservationName.trim() || needsRulesAcceptance"
           class="w-full py-3 bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue dark:border-haven-yellow dark:shadow-none text-xs font-black uppercase tracking-widest rounded-xl border-2 border-haven-blue shadow-[3px_3px_0px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
       >
         {{ isSubmitting ? $t('room_scheduler.btn_submitting') : $t('room_scheduler.btn_confirm') }}

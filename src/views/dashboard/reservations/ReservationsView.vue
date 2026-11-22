@@ -5,7 +5,10 @@ import {computed, onMounted, ref, watch} from "vue";
 import LoadingPlaceholder from "@/components/utils/LoadingPlaceholder.vue";
 import type {Reservation, ReservationCheck} from "@/types/reservations.js";
 import {reservationService} from "@/services/reservationService.js";
-import {roomService} from "@/services/roomService.js";
+import {isRoomRulesError, roomService} from "@/services/roomService.js";
+import RoomRulesCheckbox from "@/components/rooms/RoomRulesCheckbox.vue";
+import RoomRulesList from "@/components/rooms/RoomRulesList.vue";
+import type {RoomRules} from "@/types/room.js";
 import {useI18n} from "vue-i18n";
 import {Camera, CameraResultType, CameraSource} from "@capacitor/camera";
 
@@ -40,11 +43,41 @@ const lastPage = ref(1);
 
 const checkPreview = ref<{ resId: number; type: 'check_in' | 'check_out' } | null>(null);
 const checkPreviewReservation = computed(() => reservations.value.find(res => res.id === checkPreview.value?.resId) ?? null);
-const openCheckPreview = (res: Reservation, type: 'check_in' | 'check_out') => {
+
+// Check-in asks for the rules every time, loaded fresh so the resident sees
+// the current version. The accepted hash is kept until the photos are sent.
+const checkRules = ref<RoomRules | null>(null);
+const checkRulesAccepted = ref(false);
+const checkRulesChanged = ref(false);
+const isLoadingCheckRules = ref(false);
+const acceptedRulesHashes = ref<Record<number, string>>({});
+const needsCheckRulesAcceptance = computed(() =>
+    checkPreview.value?.type === 'check_in' && !!checkRules.value?.rules_hash && !checkRulesAccepted.value
+);
+
+const openCheckPreview = async (res: Reservation, type: 'check_in' | 'check_out') => {
+  if (isLoadingCheckRules.value) return;
+
+  checkRules.value = null;
+  checkRulesAccepted.value = false;
+
+  if (type === 'check_in') {
+    isLoadingCheckRules.value = true;
+    try {
+      checkRules.value = await roomService.getRules(res.room_id);
+    } catch {
+      checkErrors.value = {...checkErrors.value, [res.id]: t('room_rules.load_error')};
+      return;
+    } finally {
+      isLoadingCheckRules.value = false;
+    }
+  }
+
   checkPreview.value = {resId: res.id, type};
 };
 const closeCheckPreview = () => {
   checkPreview.value = null;
+  checkRulesChanged.value = false;
 };
 
 const lightboxUrl = ref<string | null>(null);
@@ -249,9 +282,23 @@ const takePhoto = async (res: Reservation, type: 'check_in' | 'check_out') => {
 const confirmCheckPreview = async () => {
   const preview = checkPreview.value;
   const res = checkPreviewReservation.value;
-  if (!preview || !res) return;
+  if (!preview || !res || needsCheckRulesAcceptance.value) return;
+
+  if (preview.type === 'check_in') {
+    const {[res.id]: _previous, ...otherHashes} = acceptedRulesHashes.value;
+    const hash = checkRules.value?.rules_hash;
+    acceptedRulesHashes.value = hash ? {...otherHashes, [res.id]: hash} : otherHashes;
+  }
 
   closeCheckPreview();
+
+  // Back here because the rules changed while photos were waiting to be
+  // sent: send those rather than asking for a new photo.
+  if (getPendingPhotos(res, preview.type).length > 0) {
+    await submitPendingPhotos(res, preview.type);
+    return;
+  }
+
   await takePhoto(res, preview.type);
 };
 
@@ -273,7 +320,7 @@ const submitPendingPhotos = async (res: Reservation, type: 'check_in' | 'check_o
 
   try {
     const response = type === 'check_in'
-        ? await reservationService.checkIn(res.id, photos)
+        ? await reservationService.checkIn(res.id, photos, acceptedRulesHashes.value[res.id])
         : await reservationService.checkOut(res.id, photos);
 
     reservations.value = reservations.value.map(r => {
@@ -285,6 +332,12 @@ const submitPendingPhotos = async (res: Reservation, type: 'check_in' | 'check_o
     const {[key]: _removedPending, ...remainingPending} = pendingCheckPhotos.value;
     pendingCheckPhotos.value = remainingPending;
   } catch (error: any) {
+    if (type === 'check_in' && isRoomRulesError(error)) {
+      await openCheckPreview(res, 'check_in');
+      checkRulesChanged.value = checkPreview.value !== null;
+      return;
+    }
+
     const validationErrors = error.response?.data?.errors;
     const photosErrors = validationErrors
         ? Object.keys(validationErrors)
@@ -498,8 +551,8 @@ watch([activeTimeline, activeStatus, selectedRoomSlug], () => {
                     v-else-if="res.status === 'approved' && !isCheckInWindowClosed(res) && !isCheckInWindowNotYetOpen(res) && getPendingPhotos(res, 'check_in').length === 0"
                     type="button"
                     class="px-3 py-1.5 rounded-xl text-xs font-black cursor-pointer active:scale-95 transition-all bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue"
-                    :class="{'opacity-50 pointer-events-none': submittingCheckKey !== null}"
-                    :disabled="submittingCheckKey !== null"
+                    :class="{'opacity-50 pointer-events-none': submittingCheckKey !== null || isLoadingCheckRules}"
+                    :disabled="submittingCheckKey !== null || isLoadingCheckRules"
                     @click="openCheckPreview(res, 'check_in')"
                 >
                   {{ $t('reservations.checks.actions.check_in') }}
@@ -730,10 +783,19 @@ watch([activeTimeline, activeStatus, selectedRoomSlug], () => {
           class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           @click.self="closeCheckPreview"
       >
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full max-h-full overflow-y-auto space-y-4 shadow-xl">
           <h3 class="text-base font-black text-slate-800 dark:text-slate-100">
             {{ $t('reservations.checks.example_modal.title') }}
           </h3>
+
+          <p v-if="checkRulesChanged" class="text-xs font-bold text-haven-red">
+            {{ $t('room_rules.changed') }}
+          </p>
+
+          <template v-if="checkPreview.type === 'check_in' && checkRules?.rules_hash">
+            <RoomRulesList :rules="checkRules"/>
+            <RoomRulesCheckbox v-model="checkRulesAccepted"/>
+          </template>
 
           <div
               v-if="getRoomMeta(checkPreviewReservation.room_id).checkin_example_photo_urls?.length"
@@ -770,7 +832,8 @@ watch([activeTimeline, activeStatus, selectedRoomSlug], () => {
             </button>
             <button
                 type="button"
-                class="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue cursor-pointer active:scale-95"
+                class="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-haven-blue text-white dark:bg-haven-yellow dark:text-haven-blue cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                :disabled="needsCheckRulesAcceptance"
                 @click="confirmCheckPreview"
             >
               {{ $t('reservations.checks.example_modal.continue') }}
