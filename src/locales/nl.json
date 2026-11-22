@@ -52,6 +52,16 @@
     "closed": "Niet te reserveren",
     "not_bookable": "Je kunt deze ruimte niet reserveren."
   },
+  "room_rules": {
+    "general": "Algemene regels",
+    "this_room": "Regels voor deze ruimte",
+    "popup_title": "Regels van de ruimte",
+    "read": "Lees de regels van de ruimte",
+    "accept": "Ik heb de regels gelezen en houd me eraan.",
+    "close": "Sluiten",
+    "changed": "De regels van de ruimte zijn gewijzigd. Lees en accepteer ze opnieuw.",
+    "load_error": "De regels van de ruimte konden niet worden geladen. Probeer het opnieuw."
+  },
   "room_status": {
     "available": "Beschikbaar",
     "occupied": "Bezet",

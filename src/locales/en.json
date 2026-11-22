@@ -52,6 +52,16 @@
     "closed": "Not bookable",
     "not_bookable": "You can't book this room."
   },
+  "room_rules": {
+    "general": "General rules",
+    "this_room": "Rules for this room",
+    "popup_title": "Room rules",
+    "read": "Read the room rules",
+    "accept": "I have read the rules and will follow them.",
+    "close": "Close",
+    "changed": "The room rules have changed. Please read and accept them again.",
+    "load_error": "Couldn't load the room rules. Please try again."
+  },
   "room_status": {
     "available": "Available",
     "occupied": "Occupied",

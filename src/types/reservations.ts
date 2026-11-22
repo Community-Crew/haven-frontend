@@ -41,6 +41,7 @@ export interface ReservationPayload {
     share_name: boolean;
     pow_challenge?: string;
     pow_nonce?: number;
+    rules_accepted_hash?: string;
 }
 
 export interface ReservationQueryParams {

@@ -77,9 +77,10 @@ export const reservationService = {
     /**
      * Submit photo-verified check-in for a reservation (one or more photos)
      */
-    checkIn: async (id: number, photos: File[]): Promise<{ message: string; data: ReservationCheck }> => {
+    checkIn: async (id: number, photos: File[], rulesAcceptedHash?: string): Promise<{ message: string; data: ReservationCheck }> => {
         const formData = new FormData();
         photos.forEach(photo => formData.append('photos[]', photo));
+        if (rulesAcceptedHash) formData.append('rules_accepted_hash', rulesAcceptedHash);
 
         const response = await privateApi.post(`/reservations/${id}/check-in`, formData, {
             headers: {'Content-Type': undefined},
