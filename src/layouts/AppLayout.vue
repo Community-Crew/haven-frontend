@@ -6,7 +6,9 @@ import { healthService } from "@/services/healthService.ts";
 import ThemeSwitcher from "@/components/utils/ThemeSwitcher.vue";
 import BuiltBy from "@/components/utils/BuiltBy.vue";
 import MissedPhotosModal from "@/components/reservations/MissedPhotosModal.vue";
+import ContactDetailsBanner from "@/components/user/ContactDetailsBanner.vue";
 import { navigationItems } from "@/config/navigation.ts";
+import { useProfileStore } from "@/stores/profile.ts";
 import packageInfo from '../../package.json' // 🏷️ Import your package JSON to grab the version
 
 const isCollapsed = ref(false)
@@ -29,12 +31,16 @@ onMounted(async () => {
   user.value = await userService.getCurrentUser();
 })
 
+// Former residents only have their profile left.
+const profileStore = useProfileStore()
+const visibleItems = computed(() => profileStore.isFormerResident ? [] : navigationItems)
+
 const mobilePrimaryItems = computed(() =>
-    navigationItems.filter(item => item.mobilePriority)
+    visibleItems.value.filter(item => item.mobilePriority)
 )
 
 const mobileOverflowItems = computed(() =>
-    navigationItems.filter(item => !item.mobilePriority)
+    visibleItems.value.filter(item => !item.mobilePriority)
 )
 </script>
 
@@ -62,7 +68,7 @@ const mobileOverflowItems = computed(() =>
 
         <nav class="flex flex-col space-y-1 px-3 mt-6">
           <router-link
-              v-for="item in navigationItems"
+              v-for="item in visibleItems"
               :key="item.to"
               :to="{ name: item.to }"
               class="flex items-center space-x-3 p-3 rounded-xl hover:bg-white/10 transition-all"
@@ -132,6 +138,7 @@ const mobileOverflowItems = computed(() =>
 
       <div class="flex-1 overflow-y-auto p-4 md:p-8 relative z-10 webkit-scrolling-touch">
         <div class="mx-auto w-full pt-24 md:pt-0 md:mt-16 lg:mt-24">
+          <ContactDetailsBanner/>
           <slot/>
         </div>
       </div>

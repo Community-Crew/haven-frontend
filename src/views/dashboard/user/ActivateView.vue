@@ -12,6 +12,7 @@ const profileStore = useProfileStore()
 const {t} = useI18n();
 
 const code = ref('')
+const phone = ref('')
 const isLoading = ref(false)
 const errorMessage = ref<string | null>(null)
 
@@ -51,11 +52,13 @@ async function handleActivation() {
   errorMessage.value = null
 
   try {
-    await userService.activateAccount(sanitizedCode)
+    await userService.activateAccount(sanitizedCode, phone.value)
     await profileStore.fetchProfile()
     router.push({ name: 'home.index' })
   } catch (error: any) {
-    errorMessage.value = error.response?.data?.message || t('activation.invalid_code')
+    errorMessage.value = error.response?.data?.errors?.phone
+        ? t('profile.contact.invalid_phone')
+        : error.response?.data?.message || t('activation.invalid_code')
   } finally {
     isLoading.value = false
   }
@@ -104,6 +107,22 @@ async function handleActivation() {
                   spellcheck="false"
               />
             </div>
+          </div>
+
+          <div class="space-y-1">
+            <label for="activation-phone" class="block text-xs font-black uppercase text-haven-blue/70">
+              {{ $t('profile.contact.phone') }}
+            </label>
+            <input
+                id="activation-phone"
+                type="tel"
+                required
+                v-model="phone"
+                autocomplete="tel"
+                placeholder="06 12345678"
+                class="block w-full border-2 border-haven-blue rounded-xl px-4 py-3 text-base font-bold text-slate-700 placeholder-slate-300 transition-colors focus:outline-none focus:bg-slate-50 disabled:bg-slate-50 disabled:text-slate-400"
+                :disabled="isLoading"
+            />
           </div>
 
           <Transition
