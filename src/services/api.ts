@@ -48,7 +48,9 @@ privateApi.interceptors.response.use(
                     profileStore.profile.is_activated = false;
                 }
 
-                if (router.currentRoute.value.name !== 'user.activate') {
+                // Former residents stay on their profile rather than being
+                // asked for a registration code.
+                if (!profileStore.isFormerResident && router.currentRoute.value.name !== 'user.activate') {
                     router.push({name: 'user.activate'});
                 }
             } else if (errorData?.errors === 'PRIVACY_POLICY_NOT_ACCEPTED') {

@@ -76,6 +76,11 @@ router.beforeEach(async (to) => {
         return {name: 'home.index'};
     }
 
+    // Former residents keep only their profile, to stay on as a beneficiary.
+    if (!profileStore.isActivated && profileStore.isFormerResident && !bypassActivationCheck) {
+        return to.name === 'user.profile' ? true : {name: 'user.profile'};
+    }
+
     if (!profileStore.isActivated && !bypassActivationCheck) {
         console.warn("User account is unactivated. Redirecting to activation layout.");
         return {name: 'user.activate'};

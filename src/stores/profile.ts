@@ -1,5 +1,5 @@
 import {defineStore} from 'pinia'
-import {userService} from '@/services/userService'
+import {userService, type MembershipApplication, type PostalAddress} from '@/services/userService'
 import {applyLocale, applyTheme} from '@/utils/preferences.ts'
 import type {UserSettings} from '@/types/userSettings.ts'
 
@@ -7,6 +7,18 @@ interface UserProfile {
     id: number
     name: string
     email: string
+    phone: string | null
+    birth_date: string | null
+    membership: {
+        status: string
+        identity_verified: boolean
+        documents_accepted: boolean
+        is_beneficiary: boolean
+        is_honorary: boolean
+    } | null
+    is_former_resident: boolean
+    postal_address: PostalAddress | null
+    anonymizes_at: string | null
     is_activated: boolean
     activated_at: string | null
     privacy_policy_accepted: boolean
@@ -35,10 +47,19 @@ export const useProfileStore = defineStore('profile', {
 
     getters: {
         isActivated: (state) => state.profile?.is_activated ?? false,
+        // Moved out: only the profile is left, to stay on as a beneficiary.
+        isFormerResident: (state) => state.profile?.is_former_resident ?? false,
         // Defaults to true while the profile hasn't loaded yet, so the
         // router guard doesn't bounce an unauthenticated/unresolved visitor
         // into the accept-gate before fetchProfile() has had a chance to run.
         hasAcceptedPrivacyPolicy: (state) => state.profile?.privacy_policy_accepted ?? true,
+        // Existing users get a reminder rather than a block - see
+        // ContactDetailsBanner.vue.
+        isMissingContactDetails: (state) => {
+            const profile = state.profile
+            if (!profile?.is_activated) return false
+            return !profile.phone || (!!profile.membership && !profile.birth_date)
+        },
     },
 
     actions: {
@@ -73,6 +94,14 @@ export const useProfileStore = defineStore('profile', {
                 applySettings(previous)
                 throw error
             }
+        },
+
+        async updateContactDetails(details: { phone?: string; birth_date?: string; postal_address?: PostalAddress }) {
+            this.profile = await userService.updateContactDetails(details)
+        },
+
+        async applyForMembership(application: MembershipApplication) {
+            this.profile = await userService.applyForMembership(application)
         },
 
         clearProfile() {
